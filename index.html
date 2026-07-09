@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poppins:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
-
+ 
 :root{
   --bg-deep:#0B0B1F;
   --bg-deep2:#120C2B;
@@ -42,7 +42,7 @@ body{
   90%{opacity:0.5;}
   100%{transform:translate3d(var(--drift,20px),-115vh,0) rotate(360deg);opacity:0;}
 }
-
+ 
 .screen{
   position:relative;z-index:1;
   min-height:100vh;
@@ -52,7 +52,7 @@ body{
   padding:40px 18px;
 }
 .screen.active{display:flex;}
-
+ 
 /* ---------- shared card ---------- */
 .card{
   background:var(--card);
@@ -82,7 +82,7 @@ h1.brand{
   -webkit-background-clip:text;background-clip:text;color:transparent;
 }
 p.sub{color:var(--text-dim);font-size:14.5px;line-height:1.6;margin:0 0 26px 0;}
-
+ 
 /* ---------- login ---------- */
 #loginScreen .card{max-width:430px;}
 .tabs{display:flex;gap:6px;margin-bottom:26px;background:rgba(255,255,255,0.04);padding:5px;border-radius:14px;}
@@ -91,7 +91,7 @@ p.sub{color:var(--text-dim);font-size:14.5px;line-height:1.6;margin:0 0 26px 0;}
   font-family:'Poppins';font-size:13px;font-weight:500;border-radius:10px;cursor:pointer;transition:.25s;
 }
 .tab-btn.active{background:linear-gradient(135deg,var(--violet),var(--pink));color:#fff;box-shadow:0 6px 18px rgba(255,46,146,0.35);}
-
+ 
 label{display:block;font-size:12.5px;color:var(--text-dim);margin:16px 0 7px;letter-spacing:.3px;}
 label:first-of-type{margin-top:0;}
 input[type=text],input[type=password],input[type=date],textarea{
@@ -102,7 +102,7 @@ input[type=text],input[type=password],input[type=date],textarea{
 input::placeholder,textarea::placeholder{color:#65618a;}
 input:focus,textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,46,146,0.15);}
 textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
-
+ 
 .btn{
   border:none;cursor:pointer;font-family:'Baloo 2';font-weight:700;font-size:15.5px;
   padding:14px 22px;border-radius:14px;color:#fff;letter-spacing:.3px;
@@ -117,7 +117,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
 .btn.ghost{background:transparent;box-shadow:none;border:1px dashed var(--card-border);color:var(--text-dim);}
 .btn.small{width:auto;padding:9px 16px;font-size:13px;}
 .err{color:var(--pink);font-size:12.5px;margin-top:12px;min-height:14px;font-weight:500;}
-
+ 
 /* ---------- create screen ---------- */
 #createScreen .card{max-width:640px;}
 .step-track{display:flex;gap:8px;margin-bottom:28px;}
@@ -125,11 +125,11 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
 .step-dot i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--pink),var(--gold));transition:width .4s;}
 .step-dot.done i{width:100%;}
 .step-dot.active i{width:55%;}
-
+ 
 .step{display:none;}
 .step.active{display:block;animation:fadeSlide .35s ease;}
 @keyframes fadeSlide{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
-
+ 
 .upload-box{
   border:1.5px dashed var(--card-border);border-radius:18px;padding:26px;text-align:center;
   cursor:pointer;transition:.2s;background:rgba(255,255,255,0.03);position:relative;
@@ -138,19 +138,19 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
 .upload-box input{display:none;}
 .upload-box .icon{font-size:26px;display:block;margin-bottom:6px;}
 .hero-preview{width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto 12px;border:2px solid var(--gold);box-shadow:0 0 22px rgba(255,209,102,0.35);display:none;}
-
+ 
 .gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px;margin-top:14px;}
 .gallery-thumb{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;border:1px solid var(--card-border);}
 .gallery-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
 .gallery-thumb .rm{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.6);color:#fff;width:20px;height:20px;border-radius:50%;border:none;font-size:11px;cursor:pointer;line-height:20px;}
-
+ 
 .mem-row{display:flex;gap:8px;margin-bottom:9px;align-items:center;}
 .mem-row textarea{flex:1;}
 .mem-row .rm{background:rgba(255,46,146,0.12);color:var(--pink);border:none;width:32px;height:32px;flex:0 0 32px;border-radius:10px;cursor:pointer;font-size:15px;}
-
+ 
 .nav-row{display:flex;gap:10px;margin-top:26px;}
 .nav-row .btn{flex:1;}
-
+ 
 /* ---------- generated screen ---------- */
 #genScreen .card{max-width:480px;text-align:center;}
 .gen-icon{font-size:44px;margin-bottom:6px;}
@@ -161,7 +161,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
 }
 .hint{font-size:12.5px;color:var(--text-dim);margin-top:16px;line-height:1.7;}
 .gen-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
-
+ 
 /* ================= PARTY VIEW ================= */
 #partyScreen{padding:0;display:none;min-height:100vh;flex-direction:column;align-items:center;perspective:1400px;}
 #partyScreen.active{display:flex;}
@@ -174,7 +174,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
 .exit-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .exit-bar a{color:var(--text-dim);font-size:12.5px;text-decoration:none;font-family:'Space Mono';cursor:pointer;}
 .exit-bar a:hover{color:var(--cyan);}
-
+ 
 /* medallion */
 .medallion-stage{display:flex;justify-content:center;padding:30px 0 10px;}
 .medallion{position:relative;width:230px;height:230px;transform-style:preserve-3d;animation:medallionFloat 6s ease-in-out infinite;}
@@ -186,13 +186,13 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
 .medallion-photo img{width:100%;height:100%;object-fit:cover;}
 .orbit{position:absolute;inset:-28px;animation:spinRing 14s linear infinite reverse;}
 .orbit span{position:absolute;font-size:20px;filter:drop-shadow(0 0 6px rgba(255,255,255,0.25));}
-
+ 
 .hero-name{
   text-align:center;font-family:'Baloo 2';font-weight:800;font-size:40px;margin:18px 0 2px;
   background:linear-gradient(90deg,var(--gold),var(--pink),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;
 }
 .hero-tag{text-align:center;color:var(--text-dim);font-family:'Space Mono';font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:36px;}
-
+ 
 /* live age */
 .age-panel{
   background:var(--card);border:1px solid var(--card-border);border-radius:24px;padding:26px 20px;
@@ -213,14 +213,14 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
 @keyframes cellFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
 .age-num{font-family:'Space Mono';font-weight:700;font-size:26px;color:var(--gold);text-shadow:0 0 18px rgba(255,209,102,0.4);}
 .age-lbl{font-size:10.5px;color:var(--text-dim);letter-spacing:1.5px;margin-top:4px;text-transform:uppercase;}
-
+ 
 /* section title */
 .sec-title{
   font-family:'Baloo 2';font-weight:700;font-size:22px;margin:0 0 6px;
   display:flex;align-items:center;gap:10px;
 }
 .sec-sub{color:var(--text-dim);font-size:12.5px;margin-bottom:22px;}
-
+ 
 /* photo gallery 4D */
 .gallery-4d{
   display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:22px;margin-bottom:52px;
@@ -237,7 +237,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
 .g-card::after{content:'';position:absolute;inset:0;background:linear-gradient(200deg,transparent 55%,rgba(0,0,0,0.55));pointer-events:none;}
 .g-card .glow{position:absolute;inset:0;border-radius:20px;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.15), 0 0 0 0 rgba(255,46,146,0);transition:box-shadow .25s;}
 .g-card:hover .glow{box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25), 0 0 32px 4px rgba(255,46,146,0.35);}
-
+ 
 /* messages floating 3D */
 .msg-stage{position:relative;min-height:340px;margin-bottom:20px;perspective:1200px;}
 .bubble{
@@ -253,13 +253,13 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
   0%,100%{transform:translateY(0) rotate3d(1,1,0,0deg);}
   50%{transform:translateY(-12px) rotate3d(1,1,0,4deg);}
 }
-
+ 
 .footer-made{
   text-align:center;margin-top:50px;font-family:'Space Mono';font-size:12px;letter-spacing:2px;
   color:var(--text-dim);
 }
 .footer-made b{background:linear-gradient(90deg,var(--pink),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;}
-
+ 
 .field-row{display:flex;gap:12px;}
 .field-row > div{flex:1;}
 @media(max-width:520px){
@@ -270,21 +270,21 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
 </style>
 </head>
 <body>
-
+ 
 <div id="particleField"></div>
-
+ 
 <!-- ================= LOGIN / JOIN ================= -->
 <div class="screen active" id="loginScreen">
   <div class="card">
     <div class="eyebrow">code-x studio</div>
     <h1 class="brand">3D Party Studio</h1>
     <p class="sub">Build a private, shareable 3D birthday experience — a floating avatar, a live-ticking age, a 4D photo gallery and floating memories.</p>
-
+ 
     <div class="tabs">
       <button class="tab-btn active" id="tabHost" onclick="switchTab('host')">Host login</button>
       <button class="tab-btn" id="tabJoin" onclick="switchTab('join')">I have an invite code</button>
     </div>
-
+ 
     <div id="hostPane">
       <label>Username</label>
       <input type="text" id="username" placeholder="code-x" autocomplete="off">
@@ -295,7 +295,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
       </div>
       <div class="err" id="loginErr"></div>
     </div>
-
+ 
     <div id="joinPane" style="display:none;">
       <label>Invite code</label>
       <input type="text" id="joinCode" placeholder="e.g. 7F3KQ2" style="text-transform:uppercase;">
@@ -306,21 +306,21 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
     </div>
   </div>
 </div>
-
+ 
 <!-- ================= CREATE PARTY ================= -->
 <div class="screen" id="createScreen">
   <div class="card">
     <div class="eyebrow">step <span id="stepNum">1</span> of 4</div>
     <h1 class="brand" style="font-size:26px;">Design the celebration</h1>
     <p class="sub" style="margin-bottom:18px;">Every detail here becomes part of the generated 3D page.</p>
-
+ 
     <div class="step-track">
       <div class="step-dot active" id="dot1"><i></i></div>
       <div class="step-dot" id="dot2"><i></i></div>
       <div class="step-dot" id="dot3"><i></i></div>
       <div class="step-dot" id="dot4"><i></i></div>
     </div>
-
+ 
     <!-- step 1: hero photo + name + dob -->
     <div class="step active" id="step1">
       <label>Hero photo (the main portrait)</label>
@@ -330,7 +330,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
         <div id="heroLabel">Click to upload their photo</div>
         <input type="file" id="heroInput" accept="image/*" onchange="handleHero(event)">
       </div>
-
+ 
       <div class="field-row">
         <div>
           <label>Full name</label>
@@ -344,7 +344,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
       <div class="err" id="step1Err"></div>
       <div class="nav-row"><button class="btn" onclick="goStep(2)">Continue</button></div>
     </div>
-
+ 
     <!-- step 2: memories -->
     <div class="step" id="step2">
       <label>Memories &amp; wishes</label>
@@ -356,7 +356,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
         <button class="btn" onclick="goStep(3)">Continue</button>
       </div>
     </div>
-
+ 
     <!-- step 3: gallery photos -->
     <div class="step" id="step3">
       <label>Memory photos (multiple)</label>
@@ -371,7 +371,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
         <button class="btn" onclick="goStep(4)">Continue</button>
       </div>
     </div>
-
+ 
     <!-- step 4: review + generate -->
     <div class="step" id="step4">
       <label>Ready to generate</label>
@@ -384,7 +384,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
     </div>
   </div>
 </div>
-
+ 
 <!-- ================= GENERATED LINK ================= -->
 <div class="screen" id="genScreen">
   <div class="card">
@@ -400,7 +400,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
     <div class="hint">Made by code-x · stored privately, shareable only via this exact code.</div>
   </div>
 </div>
-
+ 
 <!-- ================= PARTY VIEW ================= -->
 <div class="screen" id="partyScreen">
   <div class="party-bg"></div>
@@ -409,7 +409,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
       <a onclick="backToLogin()">← code-x studio</a>
       <a id="partyCodeTag"></a>
     </div>
-
+ 
     <div class="medallion-stage">
       <div class="medallion">
         <div class="ring"></div>
@@ -419,7 +419,7 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
     </div>
     <div class="hero-name" id="viewName">—</div>
     <div class="hero-tag">A 3D celebration, generated by code-x</div>
-
+ 
     <div class="age-panel">
       <div class="age-title">✦ Alive since ✦</div>
       <div class="age-grid" id="ageGrid">
@@ -430,19 +430,19 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
         <div class="age-cell"><div class="age-num" id="ageSecs">00</div><div class="age-lbl">Seconds</div></div>
       </div>
     </div>
-
+ 
     <div class="sec-title">🖼️ Moments <span style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';font-weight:400;">// 4D gallery</span></div>
     <div class="sec-sub">Tilt-reactive, ever-floating photo frames.</div>
     <div class="gallery-4d" id="galleryView"></div>
-
+ 
     <div class="sec-title">💬 Messages <span style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';font-weight:400;">// floating in 3D</span></div>
     <div class="sec-sub">Wishes and memories, drifting gently.</div>
     <div class="msg-stage" id="msgStage"></div>
-
+ 
     <div class="footer-made">made with 🎉 by <b>code-x</b></div>
   </div>
 </div>
-
+ 
 <script>
 /* ---------------- ambient particles ---------------- */
 (function(){
@@ -464,17 +464,17 @@ textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
     field.appendChild(s);
   }
 })();
-
+ 
 /* ---------------- state ---------------- */
 let partyData = { name:'', dob:'', hero:'', memories:[], photos:[] };
 let currentPreviewCode = null;
-
+ 
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   window.scrollTo(0,0);
 }
-
+ 
 /* ---------------- login tabs ---------------- */
 function switchTab(which){
   const host = which==='host';
@@ -483,7 +483,7 @@ function switchTab(which){
   document.getElementById('hostPane').style.display = host?'block':'none';
   document.getElementById('joinPane').style.display = host?'none':'block';
 }
-
+ 
 function tryLogin(){
   const u = document.getElementById('username').value.trim().toLowerCase();
   const p = document.getElementById('password').value.trim();
@@ -496,7 +496,7 @@ function tryLogin(){
     err.textContent = 'Incorrect username or password.';
   }
 }
-
+ 
 async function tryJoin(){
   const code = document.getElementById('joinCode').value.trim().toUpperCase();
   const err = document.getElementById('joinErr');
@@ -513,11 +513,11 @@ async function tryJoin(){
     err.textContent = 'No party found for that code.';
   }
 }
-
+ 
 function backToLogin(){
   showScreen('loginScreen');
 }
-
+ 
 /* ---------------- create flow ---------------- */
 function resetForm(){
   partyData = { name:'', dob:'', hero:'', memories:[], photos:[] };
@@ -531,7 +531,7 @@ function resetForm(){
   addMemoryRow(); addMemoryRow();
   goStep(1,true);
 }
-
+ 
 function goStep(n, silent){
   if(!silent && n>1){
     // validate step 1 before leaving it
@@ -554,7 +554,7 @@ function goStep(n, silent){
   }
   document.getElementById('stepNum').textContent = n;
 }
-
+ 
 function resizeImage(file, maxDim, quality){
   return new Promise((resolve,reject)=>{
     const reader = new FileReader();
@@ -576,7 +576,7 @@ function resizeImage(file, maxDim, quality){
     reader.readAsDataURL(file);
   });
 }
-
+ 
 async function handleHero(e){
   const file = e.target.files[0];
   if(!file) return;
@@ -587,7 +587,7 @@ async function handleHero(e){
   document.getElementById('heroIcon').style.display='none';
   document.getElementById('heroLabel').textContent='Looks great — click to change';
 }
-
+ 
 async function handleGallery(e){
   const files = Array.from(e.target.files);
   for(const f of files){
@@ -597,7 +597,7 @@ async function handleGallery(e){
   renderGalleryGrid();
   e.target.value='';
 }
-
+ 
 function renderGalleryGrid(){
   const grid = document.getElementById('galleryGrid');
   grid.innerHTML='';
@@ -609,7 +609,7 @@ function renderGalleryGrid(){
   });
 }
 function removePhoto(i){ partyData.photos.splice(i,1); renderGalleryGrid(); }
-
+ 
 function addMemoryRow(value){
   const list = document.getElementById('memList');
   const row = document.createElement('div');
@@ -617,19 +617,19 @@ function addMemoryRow(value){
   row.innerHTML = `<textarea rows="2" placeholder="A memory or birthday wish…">${value||''}</textarea><button class="rm" onclick="this.parentElement.remove()">✕</button>`;
   list.appendChild(row);
 }
-
+ 
 function collectMemories(){
   return Array.from(document.querySelectorAll('#memList textarea'))
     .map(t=>t.value.trim()).filter(Boolean);
 }
-
+ 
 function randCode(len){
   const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
   let s='';
   for(let i=0;i<len;i++) s+=chars[Math.floor(Math.random()*chars.length)];
   return s;
 }
-
+ 
 async function generateParty(){
   const btn = document.getElementById('generateBtn');
   const err = document.getElementById('genErr');
@@ -654,26 +654,26 @@ async function generateParty(){
     btn.disabled = false;
   }
 }
-
+ 
 function copyCode(){
   const code = document.getElementById('genCode').textContent;
   navigator.clipboard?.writeText(code).catch(()=>{});
 }
-
+ 
 function previewParty(){
   if(!currentPreviewCode) return;
   renderParty(partyData, currentPreviewCode);
   showScreen('partyScreen');
 }
-
+ 
 /* ---------------- party rendering ---------------- */
 let ageTimer = null;
-
+ 
 function renderParty(data, code){
   document.getElementById('viewHeroImg').src = data.hero;
   document.getElementById('viewName').textContent = data.name;
   document.getElementById('partyCodeTag').textContent = 'invite · '+code;
-
+ 
   // orbiting decorations
   const orbit = document.getElementById('orbitLayer');
   orbit.innerHTML='';
@@ -689,7 +689,7 @@ function renderParty(data, code){
     span.style.top = y+'px';
     orbit.appendChild(span);
   });
-
+ 
   // gallery
   const gv = document.getElementById('galleryView');
   gv.innerHTML='';
@@ -710,7 +710,7 @@ function renderParty(data, code){
   if(!(data.photos||[]).length){
     gv.innerHTML = '<div style="color:var(--text-dim);font-size:13px;">No memory photos were added.</div>';
   }
-
+ 
   // messages
   const ms = document.getElementById('msgStage');
   ms.innerHTML='';
@@ -734,7 +734,7 @@ function renderParty(data, code){
     const rows = Math.ceil(mems.length/3);
     ms.style.minHeight = (rows*150+140)+'px';
   }
-
+ 
   // live age
   if(ageTimer) clearInterval(ageTimer);
   const dobDate = new Date(data.dob+'T00:00:00');
@@ -758,7 +758,7 @@ function renderParty(data, code){
   tick();
   ageTimer = setInterval(tick,1000);
 }
-
+ 
 /* init */
 resetForm();
 </script>
