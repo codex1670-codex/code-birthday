@@ -1,619 +1,795 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>code-x // birthday reveal</title>
+<title>code-x • 3D Birthday Party Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg-deep:#0a0a1f;
-    --bg-panel:#15132b;
-    --bg-panel-2:#1d1a3a;
-    --line:#332f5c;
-    --gold:#ffc94d;
-    --magenta:#ff4fa0;
-    --cyan:#4de1ff;
-    --text:#f3efff;
-    --muted:#a79fc9;
-    --danger:#ff5d6c;
+    --void: #0a0518;
+    --void-2: #150a2e;
+    --violet: #6a2fd0;
+    --magenta: #ff3fa4;
+    --gold: #ffcf5c;
+    --cyan: #38f2e0;
+    --glass: rgba(255,255,255,0.06);
+    --glass-brd: rgba(255,255,255,0.14);
+    --ink: #f4f0ff;
+    --ink-dim: rgba(244,240,255,0.62);
+    --font-display: 'Baloo 2', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+    --font-mono: 'Space Mono', monospace;
   }
-  *{box-sizing:border-box;}
-  html,body{margin:0;padding:0;height:100%;}
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
   body{
-    background:radial-gradient(1200px 800px at 50% -10%, #201c47 0%, var(--bg-deep) 55%, #050512 100%);
-    color:var(--text);
-    font-family:'Inter',sans-serif;
+    font-family: var(--font-body);
+    background: radial-gradient(ellipse at 20% 0%, #26124f 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 15%, #3a0f4a 0%, transparent 50%),
+                radial-gradient(ellipse at 50% 100%, #0f0a2e 0%, transparent 60%),
+                linear-gradient(180deg, var(--void) 0%, var(--void-2) 100%);
+    background-color: var(--void);
+    color: var(--ink);
     min-height:100vh;
     overflow-x:hidden;
     position:relative;
   }
-  ::selection{background:var(--magenta);color:#fff;}
-
-  .eyebrow{
-    font-family:'JetBrains Mono',monospace;
-    letter-spacing:.18em;
-    text-transform:uppercase;
-    font-size:11px;
-    color:var(--cyan);
-    opacity:.85;
-  }
-  h1,h2,h3{font-family:'Unbounded',sans-serif;margin:0;}
-
-  /* ---------- confetti canvas ---------- */
-  #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
-
+  ::selection{ background: var(--magenta); color:white; }
+  #confetti-canvas{ position:fixed; inset:0; width:100%; height:100%; pointer-events:none; z-index:0; }
   .screen{
-    position:relative;z-index:1;
+    position:relative; z-index:1;
     min-height:100vh;
     display:none;
-    align-items:center;
-    justify-content:center;
-    padding:32px 16px;
+    align-items:center; justify-content:center;
+    padding: 40px 20px;
   }
-  .screen.active{display:flex;}
-
-  /* ---------- shared panel ---------- */
-  .panel{
-    width:100%;max-width:460px;
-    background:linear-gradient(180deg, rgba(29,26,58,.9), rgba(21,19,43,.92));
-    border:1px solid var(--line);
-    border-radius:18px;
-    padding:32px 28px;
-    box-shadow:0 30px 60px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.03);
-    backdrop-filter:blur(6px);
+  .screen.active{ display:flex; }
+ 
+  /* ---------- shared glass card ---------- */
+  .glass{
+    background: var(--glass);
+    border: 1px solid var(--glass-brd);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.08);
   }
-  .panel.wide{max-width:560px;}
-
-  .brand{
-    display:flex;align-items:center;gap:10px;margin-bottom:22px;
+  .eyebrow{
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--cyan);
+    display:flex; align-items:center; gap:8px;
+    margin-bottom: 10px;
   }
-  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--magenta);box-shadow:0 0 12px var(--magenta);}
-  .brand span{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.12em;color:var(--muted);}
-
-  label{
-    display:block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;
-    text-transform:uppercase;color:var(--muted);margin:16px 0 6px;
+  .eyebrow::before{ content:''; width:16px; height:1px; background:var(--cyan); }
+ 
+  h1,h2,h3{ font-family: var(--font-display); font-weight:700; }
+ 
+  input[type=text], input[type=date], textarea{
+    width:100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--glass-brd);
+    border-radius: 12px;
+    padding: 13px 16px;
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 15px;
+    outline: none;
+    transition: border-color .2s, background .2s;
   }
-  label.first{margin-top:0;}
-  input[type=text],input[type=password],input[type=date],textarea{
-    width:100%;background:#0e0c22;border:1px solid var(--line);color:var(--text);
-    border-radius:10px;padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;
-    outline:none;transition:border-color .15s, box-shadow .15s;
+  input[type=text]:focus, input[type=date]:focus, textarea:focus{
+    border-color: var(--cyan);
+    background: rgba(255,255,255,0.08);
   }
-  input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.15);}
-  textarea{resize:vertical;min-height:90px;line-height:1.5;}
-
-  .file-drop{
-    border:1.5px dashed var(--line);border-radius:12px;padding:16px;text-align:center;
-    cursor:pointer;transition:border-color .15s,background .15s;font-size:13px;color:var(--muted);
+  input::placeholder, textarea::placeholder{ color: rgba(244,240,255,0.35); }
+  label.field-label{
+    display:block; font-size:12.5px; letter-spacing:0.5px; color: var(--ink-dim);
+    margin-bottom:7px; font-weight:500;
   }
-  .file-drop:hover{border-color:var(--cyan);background:rgba(77,225,255,.05);}
-  .file-drop input{display:none;}
-  .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
-  .thumbs img{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--line);}
-
-  button.primary{
-    width:100%;margin-top:22px;padding:13px 18px;border:none;border-radius:10px;cursor:pointer;
-    font-family:'Unbounded',sans-serif;font-weight:600;font-size:14px;letter-spacing:.02em;
-    background:linear-gradient(135deg,var(--magenta),var(--gold));color:#1a0a12;
-    box-shadow:0 10px 24px -8px rgba(255,79,160,.55);
-    transition:transform .15s, box-shadow .15s;
+  .field{ margin-bottom: 20px; }
+ 
+  button{ font-family: var(--font-body); cursor:pointer; border:none; }
+  .btn-primary{
+    background: linear-gradient(135deg, var(--magenta), var(--violet));
+    color:white;
+    padding: 14px 30px;
+    border-radius: 100px;
+    font-weight:600;
+    font-size:15px;
+    letter-spacing:0.3px;
+    box-shadow: 0 10px 30px rgba(255,63,164,0.35);
+    transition: transform .18s ease, box-shadow .18s ease;
   }
-  button.primary:hover{transform:translateY(-1px);box-shadow:0 14px 28px -8px rgba(255,79,160,.7);}
-  button.primary:active{transform:translateY(0);}
-  button.ghost{
-    width:100%;margin-top:10px;padding:11px 18px;border-radius:10px;cursor:pointer;
-    background:transparent;border:1px solid var(--line);color:var(--muted);
-    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.05em;
+  .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 14px 36px rgba(255,63,164,0.5); }
+  .btn-primary:active{ transform: translateY(0); }
+  .btn-primary:disabled{ opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn-ghost{
+    background: transparent;
+    border: 1px solid var(--glass-brd);
+    color: var(--ink);
+    padding: 12px 22px;
+    border-radius: 100px;
+    font-size:14px;
+    font-weight:500;
+    transition: border-color .18s, background .18s;
   }
-  button.ghost:hover{border-color:var(--cyan);color:var(--cyan);}
-
-  .error-msg{color:var(--danger);font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:10px;min-height:14px;}
-  .hint{color:var(--muted);font-size:12px;margin-top:6px;line-height:1.5;}
-
+  .btn-ghost:hover{ border-color: var(--cyan); background: rgba(56,242,224,0.08); }
+ 
+  /* ================= LOGIN ================= */
+  #login-screen .card{ width: 100%; max-width: 400px; padding: 42px 36px; text-align:center; }
+  .badge-x{
+    width:64px; height:64px; margin: 0 auto 18px;
+    border-radius: 18px;
+    background: linear-gradient(135deg, var(--magenta), var(--gold));
+    display:flex; align-items:center; justify-content:center;
+    font-family: var(--font-display); font-size: 28px; font-weight:800; color:#1a0b2e;
+    transform: rotate(-6deg);
+    box-shadow: 0 12px 30px rgba(255,207,92,0.3);
+  }
+  #login-screen h1{ font-size: 26px; margin-bottom:6px; }
+  #login-screen p.sub{ color:var(--ink-dim); font-size:13.5px; margin-bottom: 28px; }
+  #login-error{
+    color:#ff8fb3; font-size: 13px; margin-top:14px; min-height:16px;
+    font-family: var(--font-mono);
+  }
+  .shake{ animation: shake .4s; }
+  @keyframes shake{
+    10%,90%{ transform: translateX(-2px); }
+    20%,80%{ transform: translateX(4px); }
+    30%,50%,70%{ transform: translateX(-8px); }
+    40%,60%{ transform: translateX(8px); }
+  }
+ 
+  /* ================= FORM ================= */
+  #form-screen{ align-items:flex-start; padding-top:64px; }
+  .form-wrap{ width:100%; max-width: 640px; margin: 0 auto; }
+  .form-wrap .card{ padding: 38px 34px; }
+  .upload-row{ display:flex; gap:16px; align-items:center; margin-bottom:22px; }
+  .avatar-preview{
+    width:84px; height:84px; border-radius:20px; overflow:hidden; flex-shrink:0;
+    background: rgba(255,255,255,0.05); border:1px dashed var(--glass-brd);
+    display:flex; align-items:center; justify-content:center;
+    font-size:11px; color:var(--ink-dim); text-align:center;
+  }
+  .avatar-preview img{ width:100%; height:100%; object-fit:cover; }
+  .upload-btn{
+    background: rgba(255,255,255,0.06); border:1px solid var(--glass-brd);
+    color:var(--ink); padding:10px 18px; border-radius:10px; font-size:13.5px;
+  }
+  .upload-btn:hover{ border-color: var(--gold); }
+  input[type=file]{ display:none; }
+  .gallery-thumbs{ display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; }
+  .gallery-thumbs img{
+    width:56px; height:56px; object-fit:cover; border-radius:10px;
+    border:1px solid var(--glass-brd);
+  }
+  .form-actions{ display:flex; justify-content:flex-end; gap:12px; margin-top:8px; }
+  .hint{ font-size:12px; color:var(--ink-dim); margin-top:6px; }
+ 
+  /* ================= LINK SCREEN ================= */
+  #link-screen .card{ width:100%; max-width:520px; padding:40px 36px; text-align:center; }
+  .link-icon{ font-size:42px; margin-bottom:14px; }
   .link-box{
-    margin-top:18px;background:#0e0c22;border:1px solid var(--line);border-radius:10px;
-    padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);
-    word-break:break-all;
+    display:flex; gap:8px; margin: 22px 0 8px;
+    background: rgba(0,0,0,0.25); border:1px solid var(--glass-brd); border-radius:12px; padding:6px;
   }
-
-  /* ================= PARTY SCREEN ================= */
-  #partyScreen{
-    display:none;position:relative;min-height:100vh;flex-direction:column;
-    align-items:center;padding:60px 16px 40px;perspective:1400px;
+  .link-box input{ border:none; background:transparent; font-family:var(--font-mono); font-size:12.5px; }
+  .link-box input:focus{ border:none; }
+  .copy-btn{
+    background: var(--cyan); color:#06231f; padding: 0 16px; border-radius:9px; font-weight:600; font-size:13px;
   }
-  #partyScreen.active{display:flex;}
-
-  .stage-header{text-align:center;margin-bottom:8px;}
-  .stage-header .eyebrow{display:block;margin-bottom:6px;}
-
-  /* --- 3D avatar plaque --- */
-  .avatar-stage{
-    width:220px;height:220px;margin:26px auto 18px;perspective:900px;
+  .note{ font-size:12px; color:var(--ink-dim); line-height:1.6; margin-top:16px; text-align:left;
+    background: rgba(255,255,255,0.04); border-left:2px solid var(--gold); padding:12px 14px; border-radius:8px; }
+  .link-actions{ display:flex; gap:12px; justify-content:center; margin-top:26px; }
+ 
+  /* ================= PARTY PAGE ================= */
+  #party-screen{ flex-direction:column; padding: 70px 20px 90px; perspective: 1400px; }
+  .party-inner{ width:100%; max-width: 980px; margin:0 auto; display:flex; flex-direction:column; align-items:center; gap:64px; }
+ 
+  .party-title{
+    text-align:center;
   }
-  .avatar-frame{
-    width:100%;height:100%;position:relative;transform-style:preserve-3d;
-    animation:avatarSpin 9s ease-in-out infinite;
-    border-radius:50%;
+  .party-title .eyebrow{ justify-content:center; }
+  .party-title h1{
+    font-size: clamp(32px, 6vw, 54px);
+    background: linear-gradient(90deg, var(--gold), var(--magenta) 50%, var(--cyan));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    line-height:1.1;
   }
-  @keyframes avatarSpin{
-    0%,100%{transform:rotateY(-14deg) rotateX(4deg);}
-    50%{transform:rotateY(14deg) rotateX(-4deg);}
+  .party-title p{ color:var(--ink-dim); margin-top:10px; font-size:14.5px; }
+ 
+  /* 3D floating avatar medallion */
+  .avatar-stage{ perspective: 1200px; }
+  .avatar-medallion{
+    width: 220px; height:220px; border-radius:50%;
+    position:relative;
+    transform-style: preserve-3d;
+    animation: float-rotate 7s ease-in-out infinite;
   }
-  .avatar-ring{
-    position:absolute;inset:0;border-radius:50%;
-    background:conic-gradient(from 0deg,var(--magenta),var(--gold),var(--cyan),var(--magenta));
-    filter:blur(2px);
-    animation:spin 6s linear infinite;
+  .avatar-medallion .ring{
+    position:absolute; inset:-10px; border-radius:50%;
+    background: conic-gradient(from 0deg, var(--gold), var(--magenta), var(--cyan), var(--gold));
+    filter: blur(1px);
+    animation: spin 6s linear infinite;
   }
-  @keyframes spin{to{transform:rotate(360deg);}}
-  .avatar-photo{
-    position:absolute;inset:7px;border-radius:50%;overflow:hidden;
-    box-shadow:0 20px 40px -10px rgba(0,0,0,.7), inset 0 0 0 3px rgba(10,10,31,.9);
-    background:#0e0c22;
+  .avatar-medallion .photo{
+    position:absolute; inset:8px; border-radius:50%; overflow:hidden;
+    background: #1a0b2e; border: 3px solid var(--void);
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
   }
-  .avatar-photo img{width:100%;height:100%;object-fit:cover;display:block;}
-
-  .person-name{
-    font-size:clamp(26px,5vw,40px);text-align:center;margin-top:8px;
-    background:linear-gradient(90deg,var(--gold),var(--magenta));
-    -webkit-background-clip:text;background-clip:text;color:transparent;
-    text-shadow:0 0 40px rgba(255,79,160,.25);
+  .avatar-medallion .photo img{ width:100%; height:100%; object-fit:cover; }
+  @keyframes float-rotate{
+    0%,100%{ transform: translateY(0) rotateY(0deg) rotateX(0deg); }
+    25%{ transform: translateY(-14px) rotateY(10deg) rotateX(4deg); }
+    50%{ transform: translateY(0) rotateY(0deg) rotateX(-4deg); }
+    75%{ transform: translateY(14px) rotateY(-10deg) rotateX(4deg); }
   }
-  .person-sub{text-align:center;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:4px;letter-spacing:.05em;}
-
-  /* --- live DOB counter --- */
-  .counter-plaque{
-    margin:26px auto 6px;max-width:640px;width:100%;
-    background:linear-gradient(180deg,rgba(29,26,58,.75),rgba(14,12,34,.85));
-    border:1px solid var(--line);border-radius:16px;padding:20px 18px;
-    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
-    box-shadow:0 20px 40px -20px rgba(0,0,0,.6);
-  }
-  .counter-cell{text-align:center;}
-  .counter-num{
-    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:clamp(20px,4vw,30px);
-    color:var(--cyan);text-shadow:0 0 18px rgba(77,225,255,.5);
-  }
-  .counter-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
-
-  /* --- section titles --- */
-  .section-title{
-    margin:44px 0 6px;text-align:center;font-size:20px;
-  }
-  .section-sub{text-align:center;color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;margin-bottom:18px;}
-
-  /* --- floating gallery (4D) --- */
-  .gallery{
-    width:100%;max-width:900px;display:flex;flex-wrap:wrap;justify-content:center;
-    gap:26px;padding:20px 10px 10px;perspective:1200px;
-  }
-  .float-card{
-    width:150px;height:190px;border-radius:14px;overflow:hidden;position:relative;
-    transform-style:preserve-3d;cursor:pointer;
-    background:#0e0c22;border:1px solid var(--line);
-    box-shadow:0 18px 36px -14px rgba(0,0,0,.65);
-    animation:floatY 5.5s ease-in-out infinite;
-    transition:transform .15s ease-out;
-  }
-  .float-card img{width:100%;height:100%;object-fit:cover;display:block;opacity:.95;}
-  .float-card::after{
-    content:'';position:absolute;inset:0;border-radius:14px;
-    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
-    background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.55));
-  }
-  @keyframes floatY{
-    0%,100%{transform:translateY(0) rotateZ(-1.5deg);}
-    50%{transform:translateY(-16px) rotateZ(1.5deg);}
-  }
-
-  /* --- floating messages --- */
-  .messages{
-    width:100%;max-width:820px;display:flex;flex-wrap:wrap;justify-content:center;
-    gap:18px;padding:10px 10px 20px;
-  }
-  .msg-bubble{
-    background:linear-gradient(160deg,rgba(255,201,77,.14),rgba(255,79,160,.10));
-    border:1px solid rgba(255,201,77,.35);
-    border-radius:16px 16px 16px 4px;
-    padding:16px 18px;max-width:280px;font-size:14px;line-height:1.55;color:var(--text);
+  @keyframes spin{ to{ transform: rotate(360deg); } }
+  .avatar-name{ text-align:center; margin-top:22px; font-size: 24px; }
+  .avatar-sub{ text-align:center; color:var(--ink-dim); font-size:13px; margin-top:4px; font-family: var(--font-mono); }
+ 
+  /* live age counter */
+  .age-card{
+    width:100%; max-width: 720px; padding: 30px 28px;
     transform-style:preserve-3d;
-    animation:msgFloat 6s ease-in-out infinite;
-    box-shadow:0 16px 34px -16px rgba(0,0,0,.6);
+    animation: gentle-float 6s ease-in-out infinite;
   }
-  @keyframes msgFloat{
-    0%,100%{transform:translateY(0) rotateX(0deg) rotateY(0deg);}
-    50%{transform:translateY(-10px) rotateX(3deg) rotateY(-3deg);}
+  @keyframes gentle-float{
+    0%,100%{ transform: translateY(0) rotateX(0deg); }
+    50%{ transform: translateY(-10px) rotateX(2deg); }
   }
-
-  footer.made-by{
-    margin-top:50px;margin-bottom:14px;text-align:center;
-    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;
-    text-transform:uppercase;color:var(--muted);
+  .age-card h3{ font-size:14px; letter-spacing:1px; color:var(--ink-dim); font-weight:500; text-align:center; margin-bottom:20px; text-transform:uppercase; font-family:var(--font-body); }
+  .age-grid{ display:grid; grid-template-columns: repeat(5, 1fr); gap:12px; }
+  .age-unit{
+    text-align:center; padding: 16px 6px; border-radius:16px;
+    background: rgba(255,255,255,0.04); border:1px solid var(--glass-brd);
   }
-  footer.made-by span{color:var(--gold);}
-
-  .share-strip{
-    margin-top:8px;width:100%;max-width:640px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+  .age-unit .num{
+    font-family: var(--font-mono); font-size: clamp(22px, 4vw, 32px); font-weight:700;
+    color: var(--gold);
+    text-shadow: 0 0 18px rgba(255,207,92,0.5);
   }
-  .share-strip button{
-    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;
-    background:transparent;border:1px solid var(--line);color:var(--muted);
-    padding:9px 14px;border-radius:8px;cursor:pointer;
+  .age-unit .lbl{ font-size:10.5px; letter-spacing:1.5px; color:var(--ink-dim); margin-top:6px; text-transform:uppercase; }
+ 
+  /* gallery 4D */
+  .gallery-section{ width:100%; }
+  .gallery-section h3{ text-align:center; font-size:14px; letter-spacing:1px; color:var(--ink-dim); font-weight:500; text-transform:uppercase; margin-bottom: 26px; font-family:var(--font-body); }
+  .gallery-4d{
+    display:grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 24px;
   }
-  .share-strip button:hover{border-color:var(--cyan);color:var(--cyan);}
-
+  .photo-card{
+    perspective: 900px;
+    height: 220px;
+  }
+  .photo-card .inner{
+    width:100%; height:100%; border-radius:20px; overflow:hidden; position:relative;
+    transform-style:preserve-3d;
+    transition: transform .08s ease-out;
+    box-shadow: 0 18px 40px rgba(0,0,0,0.5);
+    border: 1px solid var(--glass-brd);
+    animation: card-float 5.5s ease-in-out infinite;
+  }
+  .photo-card:nth-child(2n) .inner{ animation-duration: 6.5s; animation-delay: .4s; }
+  .photo-card:nth-child(3n) .inner{ animation-duration: 7.2s; animation-delay: .8s; }
+  @keyframes card-float{
+    0%,100%{ transform: translateY(0) rotateZ(0deg); }
+    50%{ transform: translateY(-8px) rotateZ(0.6deg); }
+  }
+  .photo-card img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .photo-card .shine{
+    position:absolute; inset:0;
+    background: linear-gradient(120deg, rgba(255,255,255,0.25), transparent 40%);
+    opacity:0; transition: opacity .2s;
+  }
+  .photo-card:hover .shine{ opacity:1; }
+ 
+  /* memory message 3D floating */
+  .memory-section{ width:100%; max-width: 680px; }
+  .memory-card{
+    padding: 34px 32px;
+    transform-style: preserve-3d;
+    animation: memory-float 8s ease-in-out infinite;
+    position:relative;
+  }
+  @keyframes memory-float{
+    0%,100%{ transform: translateY(0) rotateY(0deg) rotateX(0deg); }
+    33%{ transform: translateY(-10px) rotateY(2deg) rotateX(1deg); }
+    66%{ transform: translateY(6px) rotateY(-2deg) rotateX(-1deg); }
+  }
+  .memory-card .quote-mark{ font-family: var(--font-display); font-size:52px; color: var(--magenta); opacity:.6; line-height:1; }
+  .memory-card p{ font-size: 16.5px; line-height:1.75; color: var(--ink); font-weight:300; margin-top:6px; white-space:pre-wrap; }
+ 
+  .footer-sig{
+    margin-top: 20px; text-align:center; color: var(--ink-dim); font-size:12.5px;
+    font-family: var(--font-mono); display:flex; align-items:center; gap:8px;
+  }
+  .footer-sig .dot{ width:6px; height:6px; border-radius:50%; background: var(--magenta); box-shadow: 0 0 10px var(--magenta); }
+ 
+  .party-actions{ margin-top: 10px; }
+ 
+  #not-found-screen .card{ max-width:420px; padding: 40px; text-align:center; }
+ 
+  @media (max-width: 560px){
+    .age-grid{ grid-template-columns: repeat(3, 1fr); }
+    .upload-row{ flex-wrap:wrap; }
+  }
+ 
   @media (prefers-reduced-motion: reduce){
-    .avatar-frame,.avatar-ring,.float-card,.msg-bubble{animation:none !important;}
-  }
-
-  @media (max-width:480px){
-    .counter-plaque{grid-template-columns:repeat(3,1fr);gap:8px;padding:16px 10px;}
-    .panel{padding:26px 18px;}
+    .avatar-medallion, .avatar-medallion .ring, .age-card, .photo-card .inner, .memory-card{
+      animation: none !important;
+    }
   }
 </style>
 </head>
 <body>
-
-<canvas id="confetti"></canvas>
-
+ 
+<canvas id="confetti-canvas"></canvas>
+ 
 <!-- ============ LOGIN SCREEN ============ -->
-<div class="screen active" id="loginScreen">
-  <div class="panel">
-    <div class="brand"><div class="dot"></div><span>ACCESS // CODE-X</span></div>
-    <h2 style="font-size:22px;">Private surprise console</h2>
-    <p class="hint">Enter the access credentials to build a 3D birthday reveal.</p>
-
-    <label class="first">Username</label>
-    <input type="text" id="loginUser" autocomplete="off" placeholder="username">
-
-    <label>Password</label>
-    <input type="password" id="loginPass" placeholder="password">
-
-    <div class="error-msg" id="loginError"></div>
-    <button class="primary" id="loginBtn">Unlock console</button>
+<div class="screen active" id="login-screen">
+  <div class="glass card">
+    <div class="badge-x">X</div>
+    <h1>code-x</h1>
+    <p class="sub">3D Birthday Party Generator — sign in to start building</p>
+    <div class="field" style="text-align:left;">
+      <label class="field-label">Username</label>
+      <input type="text" id="login-user" placeholder="Enter username" autocomplete="off">
+    </div>
+    <div class="field" style="text-align:left;">
+      <label class="field-label">Password</label>
+      <input type="text" id="login-pass" placeholder="Enter password" autocomplete="off">
+    </div>
+    <button class="btn-primary" style="width:100%;" id="login-btn">Sign in</button>
+    <div id="login-error"></div>
   </div>
 </div>
-
-<!-- ============ CREATE SCREEN ============ -->
-<div class="screen" id="createScreen">
-  <div class="panel wide">
-    <div class="brand"><div class="dot"></div><span>CODE-X // BUILD REVEAL</span></div>
-    <h2 style="font-size:22px;">Assemble the surprise</h2>
-    <p class="hint">Everything here is packed into one private link. Nothing is uploaded anywhere.</p>
-
-    <label class="first">Main photo (for the 3D avatar)</label>
-    <div class="file-drop" id="mainPhotoDrop">
-      <input type="file" id="mainPhoto" accept="image/*">
-      <span id="mainPhotoLabel">Tap to choose a photo</span>
-    </div>
-    <div class="thumbs" id="mainPhotoThumb"></div>
-
-    <label>Name</label>
-    <input type="text" id="personName" placeholder="e.g. Sanjiv">
-
-    <label>Date of birth</label>
-    <input type="date" id="personDOB">
-
-    <label>Memories / messages</label>
-    <textarea id="memoryText" placeholder="Write a few lines or memories — one per line works great, each becomes its own floating message."></textarea>
-
-    <label>Memory photos (multiple)</label>
-    <div class="file-drop" id="memPhotoDrop">
-      <input type="file" id="memPhotos" accept="image/*" multiple>
-      <span id="memPhotoLabel">Tap to choose photos</span>
-    </div>
-    <div class="thumbs" id="memPhotoThumb"></div>
-    <div class="hint">Tip: 3–8 lightly-sized photos keep the shareable link fast to open.</div>
-
-    <div class="error-msg" id="createError"></div>
-    <button class="primary" id="generateBtn">Generate private link</button>
-
-    <div id="linkResult" style="display:none;">
-      <div class="link-box" id="linkBox"></div>
-      <button class="ghost" id="copyLinkBtn">Copy link</button>
-      <button class="ghost" id="openLinkBtn">Open the reveal →</button>
-    </div>
-  </div>
-</div>
-
-<!-- ============ PARTY / REVEAL SCREEN ============ -->
-<div id="partyScreen">
-  <div class="stage-header">
-    <span class="eyebrow">a private reveal · code-x</span>
-    <div class="avatar-stage">
-      <div class="avatar-frame">
-        <div class="avatar-ring"></div>
-        <div class="avatar-photo"><img id="partyMainPhoto" src="" alt=""></div>
+ 
+<!-- ============ FORM SCREEN ============ -->
+<div class="screen" id="form-screen">
+  <div class="form-wrap">
+    <div class="eyebrow">Step 1 of 2</div>
+    <h2 style="font-size:26px; margin-bottom:24px;">Build the birthday page</h2>
+    <div class="glass card">
+ 
+      <label class="field-label">Avatar photo</label>
+      <div class="upload-row">
+        <div class="avatar-preview" id="avatar-preview">No photo</div>
+        <div>
+          <button class="upload-btn" id="avatar-upload-btn" type="button">Choose photo</button>
+          <div class="hint">Used for the 3D floating avatar medallion</div>
+        </div>
+      </div>
+      <input type="file" id="avatar-input" accept="image/*">
+ 
+      <div class="field">
+        <label class="field-label">Name</label>
+        <input type="text" id="p-name" placeholder="e.g. Sanjiv">
+      </div>
+ 
+      <div class="field">
+        <label class="field-label">Date of birth</label>
+        <input type="date" id="p-dob">
+      </div>
+ 
+      <div class="field">
+        <label class="field-label">Memory / message</label>
+        <textarea id="p-memory" rows="4" placeholder="Write a memory or birthday message..."></textarea>
+      </div>
+ 
+      <div class="field">
+        <label class="field-label">Gallery photos (multiple)</label>
+        <button class="upload-btn" id="gallery-upload-btn" type="button">Choose photos</button>
+        <input type="file" id="gallery-input" accept="image/*" multiple>
+        <div class="gallery-thumbs" id="gallery-thumbs"></div>
+      </div>
+ 
+      <div class="form-actions">
+        <button class="btn-ghost" id="logout-btn" type="button">Log out</button>
+        <button class="btn-primary" id="generate-btn" disabled>Generate shareable link</button>
       </div>
     </div>
-    <h1 class="person-name" id="partyName">—</h1>
-    <div class="person-sub" id="partyDobLabel">DOB —</div>
   </div>
-
-  <div class="counter-plaque">
-    <div class="counter-cell"><div class="counter-num" id="cYears">0</div><div class="counter-label">Years alive</div></div>
-    <div class="counter-cell"><div class="counter-num" id="cDays">0</div><div class="counter-label">Days since last bday</div></div>
-    <div class="counter-cell"><div class="counter-num" id="cTime">00:00:00</div><div class="counter-label">Live time</div></div>
-  </div>
-
-  <h3 class="section-title">Moments <span style="color:var(--gold)">·</span> 4D gallery</h3>
-  <div class="section-sub">tap or hover — every photo floats on its own</div>
-  <div class="gallery" id="gallery"></div>
-
-  <h3 class="section-title">Messages <span style="color:var(--magenta)">·</span> floating in 3D</h3>
-  <div class="messages" id="messages"></div>
-
-  <div class="share-strip">
-    <button id="partyCopyBtn">Copy this link</button>
-    <button id="partyBackBtn">Build another</button>
-  </div>
-
-  <footer class="made-by">crafted with <span>code-x</span></footer>
 </div>
-
+ 
+<!-- ============ LINK SCREEN ============ -->
+<div class="screen" id="link-screen">
+  <div class="glass card">
+    <div class="link-icon">🔗</div>
+    <h2 style="font-size:22px;">Your page is ready</h2>
+    <p style="color:var(--ink-dim); font-size:13.5px; margin-top:6px;">Share this link — anyone who opens it (in this browser) sees the 3D birthday page.</p>
+    <div class="link-box">
+      <input type="text" id="share-link" readonly>
+      <button class="copy-btn" id="copy-link-btn" type="button">Copy</button>
+    </div>
+    <div class="note">
+      This is a self-contained demo page (no server), so the link stores the party data locally in this browser only. Open it here anytime to view it — for a link that works on any device, this would need a small backend to host the data.
+    </div>
+    <div class="link-actions">
+      <button class="btn-ghost" id="back-to-form-btn" type="button">Edit details</button>
+      <button class="btn-primary" id="view-page-btn" type="button">Open page</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- ============ PARTY SCREEN ============ -->
+<div class="screen" id="party-screen">
+  <div class="party-inner">
+ 
+    <div class="party-title">
+      <div class="eyebrow">code-x presents</div>
+      <h1 id="party-heading">Happy Birthday!</h1>
+      <p>A little 3D celebration, made just for you</p>
+    </div>
+ 
+    <div class="avatar-stage">
+      <div class="avatar-medallion">
+        <div class="ring"></div>
+        <div class="photo"><img id="party-avatar-img" src="" alt="avatar"></div>
+      </div>
+      <div class="avatar-name" id="party-name">—</div>
+      <div class="avatar-sub" id="party-dob-sub">—</div>
+    </div>
+ 
+    <div class="glass age-card">
+      <h3>Time alive, right now</h3>
+      <div class="age-grid">
+        <div class="age-unit"><div class="num" id="age-years">0</div><div class="lbl">Years</div></div>
+        <div class="age-unit"><div class="num" id="age-days">0</div><div class="lbl">Days</div></div>
+        <div class="age-unit"><div class="num" id="age-hours">0</div><div class="lbl">Hours</div></div>
+        <div class="age-unit"><div class="num" id="age-mins">0</div><div class="lbl">Minutes</div></div>
+        <div class="age-unit"><div class="num" id="age-secs">0</div><div class="lbl">Seconds</div></div>
+      </div>
+    </div>
+ 
+    <div class="gallery-section" id="gallery-section" style="display:none;">
+      <h3>Memories in pictures</h3>
+      <div class="gallery-4d" id="party-gallery"></div>
+    </div>
+ 
+    <div class="memory-section" id="memory-section" style="display:none;">
+      <div class="glass memory-card">
+        <div class="quote-mark">"</div>
+        <p id="party-memory"></p>
+      </div>
+    </div>
+ 
+    <div class="footer-sig"><span class="dot"></span> Made by code-x</div>
+ 
+    <div class="party-actions">
+      <button class="btn-ghost" id="party-edit-btn" type="button">Edit this page</button>
+    </div>
+  </div>
+</div>
+ 
+<!-- ============ NOT FOUND ============ -->
+<div class="screen" id="not-found-screen">
+  <div class="glass card">
+    <div class="link-icon">🎈</div>
+    <h2 style="font-size:20px;">This link isn't loaded here</h2>
+    <p style="color:var(--ink-dim); font-size:13.5px; margin-top:8px;">This party page was generated on a different browser or session, so its data isn't stored here. Sign in and create a new one.</p>
+    <button class="btn-primary" style="margin-top:22px;" id="notfound-login-btn" type="button">Go to sign in</button>
+  </div>
+</div>
+ 
 <script>
-/* ============================================================
-   CONFETTI BACKGROUND
-============================================================ */
-const canvas = document.getElementById('confetti');
-const ctx = canvas.getContext('2d');
-let W,H;
-function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
-window.addEventListener('resize',resize); resize();
-
-const colors=['#ffc94d','#ff4fa0','#4de1ff','#ffffff'];
-const particles = Array.from({length:70},()=>({
-  x:Math.random()*W, y:Math.random()*H - H,
-  size:3+Math.random()*5, speed:0.6+Math.random()*1.4,
-  drift:(Math.random()-0.5)*0.6, rot:Math.random()*360,
-  rotSpeed:(Math.random()-0.5)*2, color:colors[Math.floor(Math.random()*colors.length)]
-}));
-function loop(){
-  ctx.clearRect(0,0,W,H);
-  particles.forEach(p=>{
-    p.y += p.speed; p.x += p.drift; p.rot += p.rotSpeed;
-    if(p.y > H+10){ p.y = -10; p.x = Math.random()*W; }
-    ctx.save();
-    ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
-    ctx.fillStyle = p.color; ctx.globalAlpha = 0.55;
-    ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.5);
-    ctx.restore();
-  });
-  requestAnimationFrame(loop);
-}
-loop();
-
-/* ============================================================
-   SCREEN HELPERS
-============================================================ */
-function showScreen(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById('partyScreen').classList.remove('active');
-  if(id==='party'){
-    document.getElementById('partyScreen').classList.add('active');
-  } else {
-    document.getElementById(id).classList.add('active');
+(function(){
+  "use strict";
+ 
+  /* ---------------- utility: screens ---------------- */
+  const screens = ['login-screen','form-screen','link-screen','party-screen','not-found-screen'];
+  function showScreen(id){
+    screens.forEach(s => document.getElementById(s).classList.toggle('active', s === id));
+    window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
   }
-}
-
-/* ============================================================
-   LOGIN
-============================================================ */
-document.getElementById('loginBtn').addEventListener('click', ()=>{
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value;
-  const err = document.getElementById('loginError');
-  if(u === 'code-x' && p === 'sanjiv'){
-    err.textContent='';
-    showScreen('createScreen');
-  } else {
-    err.textContent = 'Access denied — check username and password.';
+ 
+  /* ---------------- confetti background ---------------- */
+  const canvas = document.getElementById('confetti-canvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [];
+  const colors = ['#ffcf5c', '#ff3fa4', '#38f2e0', '#6a2fd0', '#ffffff'];
+  function resize(){ W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
+  window.addEventListener('resize', resize); resize();
+  function makeParticles(n){
+    particles = [];
+    for(let i=0;i<n;i++){
+      particles.push({
+        x: Math.random()*W, y: Math.random()*H - H,
+        size: 3 + Math.random()*5,
+        speed: 0.4 + Math.random()*1.1,
+        drift: (Math.random()-0.5)*0.6,
+        rot: Math.random()*360,
+        rotSpeed: (Math.random()-0.5)*2,
+        color: colors[Math.floor(Math.random()*colors.length)],
+        shape: Math.random() > 0.5 ? 'rect' : 'circle'
+      });
+    }
   }
-});
-document.getElementById('loginPass').addEventListener('keydown', e=>{
-  if(e.key==='Enter') document.getElementById('loginBtn').click();
-});
-
-/* ============================================================
-   FILE HANDLING (resize to keep link small)
-============================================================ */
-function resizeImageFile(file, maxDim, quality){
-  return new Promise((resolve,reject)=>{
-    const reader = new FileReader();
-    reader.onload = e=>{
-      const img = new Image();
-      img.onload = ()=>{
-        let {width,height} = img;
-        if(width > height && width > maxDim){ height = height*(maxDim/width); width = maxDim; }
-        else if(height >= width && height > maxDim){ width = width*(maxDim/height); height = maxDim; }
-        const c = document.createElement('canvas');
-        c.width = width; c.height = height;
-        c.getContext('2d').drawImage(img,0,0,width,height);
-        resolve(c.toDataURL('image/jpeg',quality));
-      };
-      img.onerror = reject;
-      img.src = e.target.result;
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(file);
-  });
-}
-
-let mainPhotoData = null;
-let memPhotosData = [];
-
-document.getElementById('mainPhotoDrop').addEventListener('click', ()=>document.getElementById('mainPhoto').click());
-document.getElementById('mainPhoto').addEventListener('change', async e=>{
-  const f = e.target.files[0];
-  if(!f) return;
-  mainPhotoData = await resizeImageFile(f, 480, 0.75);
-  document.getElementById('mainPhotoLabel').textContent = f.name;
-  document.getElementById('mainPhotoThumb').innerHTML = `<img src="${mainPhotoData}">`;
-});
-
-document.getElementById('memPhotoDrop').addEventListener('click', ()=>document.getElementById('memPhotos').click());
-document.getElementById('memPhotos').addEventListener('change', async e=>{
-  const files = Array.from(e.target.files).slice(0,12);
-  memPhotosData = [];
-  const thumbBox = document.getElementById('memPhotoThumb');
-  thumbBox.innerHTML = '';
-  document.getElementById('memPhotoLabel').textContent = files.length + ' photo(s) selected';
-  for(const f of files){
-    const d = await resizeImageFile(f, 380, 0.7);
-    memPhotosData.push(d);
-    thumbBox.insertAdjacentHTML('beforeend', `<img src="${d}">`);
-  }
-});
-
-/* ============================================================
-   GENERATE LINK
-============================================================ */
-function encodeData(obj){
-  const json = JSON.stringify(obj);
-  return btoa(unescape(encodeURIComponent(json)));
-}
-function decodeData(str){
-  const json = decodeURIComponent(escape(atob(str)));
-  return JSON.parse(json);
-}
-
-document.getElementById('generateBtn').addEventListener('click', ()=>{
-  const err = document.getElementById('createError');
-  const name = document.getElementById('personName').value.trim();
-  const dob = document.getElementById('personDOB').value;
-  const memoryText = document.getElementById('memoryText').value.trim();
-
-  if(!mainPhotoData){ err.textContent = 'Please add a main photo.'; return; }
-  if(!name){ err.textContent = 'Please add a name.'; return; }
-  if(!dob){ err.textContent = 'Please add a date of birth.'; return; }
-  err.textContent = '';
-
-  const data = {
-    n: name,
-    d: dob,
-    m: memoryText,
-    mainPhoto: mainPhotoData,
-    photos: memPhotosData
-  };
-
-  const encoded = encodeData(data);
-  const url = location.href.split('#')[0] + '#party=' + encoded;
-
-  document.getElementById('linkBox').textContent = url;
-  document.getElementById('linkResult').style.display = 'block';
-
-  document.getElementById('copyLinkBtn').onclick = ()=>{
-    navigator.clipboard.writeText(url).then(()=>{
-      document.getElementById('copyLinkBtn').textContent = 'Copied ✓';
-      setTimeout(()=>document.getElementById('copyLinkBtn').textContent='Copy link',1500);
-    }).catch(()=>{});
-  };
-  document.getElementById('openLinkBtn').onclick = ()=>{
-    location.hash = 'party=' + encoded;
-    renderParty(data);
-    showScreen('party');
-  };
-});
-
-/* ============================================================
-   RENDER PARTY / REVEAL PAGE
-============================================================ */
-let ageInterval = null;
-
-function renderParty(data){
-  document.getElementById('partyMainPhoto').src = data.mainPhoto || '';
-  document.getElementById('partyName').textContent = data.n || 'Someone special';
-
-  const dobDate = new Date(data.d);
-  const dobLabel = isNaN(dobDate) ? '' : dobDate.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
-  document.getElementById('partyDobLabel').textContent = dobLabel ? ('DOB · ' + dobLabel) : '';
-
-  // gallery
-  const gallery = document.getElementById('gallery');
-  gallery.innerHTML = '';
-  (data.photos || []).forEach((src,i)=>{
-    const card = document.createElement('div');
-    card.className = 'float-card';
-    card.style.animationDelay = (i*0.35)+'s';
-    card.innerHTML = `<img src="${src}" alt="memory">`;
-    card.addEventListener('mousemove', e=>{
-      const r = card.getBoundingClientRect();
-      const rx = ((e.clientY-r.top)/r.height - 0.5) * -18;
-      const ry = ((e.clientX-r.left)/r.width - 0.5) * 18;
-      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(20px)`;
+  makeParticles(70);
+  function animateConfetti(){
+    ctx.clearRect(0,0,W,H);
+    particles.forEach(p=>{
+      p.y += p.speed; p.x += p.drift; p.rot += p.rotSpeed;
+      if(p.y > H + 20){ p.y = -20; p.x = Math.random()*W; }
+      ctx.save();
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.rot * Math.PI/180);
+      ctx.fillStyle = p.color;
+      ctx.globalAlpha = 0.55;
+      if(p.shape === 'rect'){ ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.5); }
+      else { ctx.beginPath(); ctx.arc(0,0,p.size/2,0,Math.PI*2); ctx.fill(); }
+      ctx.restore();
     });
-    card.addEventListener('mouseleave', ()=>{ card.style.transform=''; });
-    gallery.appendChild(card);
+    requestAnimationFrame(animateConfetti);
+  }
+  animateConfetti();
+ 
+  /* ---------------- login ---------------- */
+  const VALID_USER = 'code-x';
+  const VALID_PASS = 'sanjiv';
+  const loginBtn = document.getElementById('login-btn');
+  const loginError = document.getElementById('login-error');
+  const loginCard = document.querySelector('#login-screen .card');
+ 
+  function attemptLogin(){
+    const u = document.getElementById('login-user').value.trim();
+    const p = document.getElementById('login-pass').value;
+    if(u === VALID_USER && p === VALID_PASS){
+      loginError.textContent = '';
+      sessionStorage.setItem('codex_authed', '1');
+      showScreen('form-screen');
+    } else {
+      loginError.textContent = 'Incorrect username or password.';
+      loginCard.classList.remove('shake');
+      void loginCard.offsetWidth;
+      loginCard.classList.add('shake');
+    }
+  }
+  loginBtn.addEventListener('click', attemptLogin);
+  document.getElementById('login-pass').addEventListener('keydown', e=>{ if(e.key==='Enter') attemptLogin(); });
+  document.getElementById('login-user').addEventListener('keydown', e=>{ if(e.key==='Enter') attemptLogin(); });
+ 
+  document.getElementById('logout-btn').addEventListener('click', ()=>{
+    sessionStorage.removeItem('codex_authed');
+    showScreen('login-screen');
   });
-
-  // messages
-  const messagesBox = document.getElementById('messages');
-  messagesBox.innerHTML = '';
-  const lines = (data.m || '').split('\n').map(s=>s.trim()).filter(Boolean);
-  if(lines.length === 0 && data.m){ lines.push(data.m); }
-  lines.forEach((line,i)=>{
-    const bubble = document.createElement('div');
-    bubble.className = 'msg-bubble';
-    bubble.style.animationDelay = (i*0.4)+'s';
-    bubble.textContent = line;
-    messagesBox.appendChild(bubble);
+  document.getElementById('notfound-login-btn').addEventListener('click', ()=> showScreen('login-screen'));
+ 
+  /* ---------------- form: image handling ---------------- */
+  let avatarDataUrl = null;
+  let galleryDataUrls = [];
+ 
+  function resizeImage(file, maxDim, quality){
+    return new Promise((resolve, reject)=>{
+      const reader = new FileReader();
+      reader.onload = e=>{
+        const img = new Image();
+        img.onload = ()=>{
+          let w = img.width, h = img.height;
+          if(w > h && w > maxDim){ h = Math.round(h * maxDim/w); w = maxDim; }
+          else if(h > maxDim){ w = Math.round(w * maxDim/h); h = maxDim; }
+          const c = document.createElement('canvas');
+          c.width = w; c.height = h;
+          c.getContext('2d').drawImage(img, 0, 0, w, h);
+          resolve(c.toDataURL('image/jpeg', quality));
+        };
+        img.onerror = reject;
+        img.src = e.target.result;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+ 
+  document.getElementById('avatar-upload-btn').addEventListener('click', ()=> document.getElementById('avatar-input').click());
+  document.getElementById('avatar-input').addEventListener('change', async (e)=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    avatarDataUrl = await resizeImage(file, 500, 0.82);
+    const preview = document.getElementById('avatar-preview');
+    preview.innerHTML = '';
+    const img = document.createElement('img');
+    img.src = avatarDataUrl;
+    preview.appendChild(img);
+    validateForm();
   });
-
-  // live age counter
-  if(ageInterval) clearInterval(ageInterval);
-  function tick(){
-    if(isNaN(dobDate)) return;
+ 
+  document.getElementById('gallery-upload-btn').addEventListener('click', ()=> document.getElementById('gallery-input').click());
+  document.getElementById('gallery-input').addEventListener('change', async (e)=>{
+    const files = Array.from(e.target.files || []);
+    for(const f of files){
+      const durl = await resizeImage(f, 700, 0.78);
+      galleryDataUrls.push(durl);
+    }
+    renderGalleryThumbs();
+    validateForm();
+  });
+  function renderGalleryThumbs(){
+    const wrap = document.getElementById('gallery-thumbs');
+    wrap.innerHTML = '';
+    galleryDataUrls.forEach(url=>{
+      const img = document.createElement('img');
+      img.src = url;
+      wrap.appendChild(img);
+    });
+  }
+ 
+  ['p-name','p-dob','p-memory'].forEach(id=>{
+    document.getElementById(id).addEventListener('input', validateForm);
+  });
+  function validateForm(){
+    const name = document.getElementById('p-name').value.trim();
+    const dob = document.getElementById('p-dob').value;
+    document.getElementById('generate-btn').disabled = !(name && dob);
+  }
+ 
+  /* ---------------- generate + storage ---------------- */
+  function uid(){
+    return 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+  }
+ 
+  document.getElementById('generate-btn').addEventListener('click', ()=>{
+    const data = {
+      name: document.getElementById('p-name').value.trim(),
+      dob: document.getElementById('p-dob').value,
+      memory: document.getElementById('p-memory').value.trim(),
+      avatar: avatarDataUrl,
+      gallery: galleryDataUrls.slice()
+    };
+    const id = uid();
+    try{
+      localStorage.setItem('codex_party_' + id, JSON.stringify(data));
+    }catch(err){
+      alert('Could not save — try fewer / smaller photos.');
+      return;
+    }
+    const url = location.origin + location.pathname + '#party=' + id;
+    document.getElementById('share-link').value = url;
+    history.replaceState(null, '', '#party=' + id);
+    showScreen('link-screen');
+  });
+ 
+  document.getElementById('copy-link-btn').addEventListener('click', ()=>{
+    const input = document.getElementById('share-link');
+    input.select();
+    input.setSelectionRange(0, 99999);
+    navigator.clipboard && navigator.clipboard.writeText(input.value).catch(()=>{ document.execCommand('copy'); });
+    const btn = document.getElementById('copy-link-btn');
+    const old = btn.textContent;
+    btn.textContent = 'Copied!';
+    setTimeout(()=> btn.textContent = old, 1400);
+  });
+ 
+  document.getElementById('back-to-form-btn').addEventListener('click', ()=> showScreen('form-screen'));
+  document.getElementById('view-page-btn').addEventListener('click', ()=>{
+    const hash = location.hash;
+    const id = (hash.match(/party=([^&]+)/) || [])[1];
+    if(id) renderParty(id);
+  });
+  document.getElementById('party-edit-btn').addEventListener('click', ()=> showScreen('form-screen'));
+ 
+  /* ---------------- party rendering ---------------- */
+  let ageInterval = null;
+ 
+  function renderParty(id){
+    const raw = localStorage.getItem('codex_party_' + id);
+    if(!raw){ showScreen('not-found-screen'); return; }
+    const data = JSON.parse(raw);
+ 
+    document.getElementById('party-heading').textContent = 'Happy Birthday, ' + (data.name.split(' ')[0] || data.name) + '!';
+    document.getElementById('party-name').textContent = data.name;
+    document.getElementById('party-avatar-img').src = data.avatar || makePlaceholderAvatar(data.name);
+ 
+    const dobDate = new Date(data.dob + 'T00:00:00');
+    document.getElementById('party-dob-sub').textContent = 'Born ' + dobDate.toLocaleDateString(undefined, { year:'numeric', month:'long', day:'numeric' });
+ 
+    // gallery
+    const gallerySection = document.getElementById('gallery-section');
+    const galleryWrap = document.getElementById('party-gallery');
+    galleryWrap.innerHTML = '';
+    if(data.gallery && data.gallery.length){
+      gallerySection.style.display = '';
+      data.gallery.forEach(url=>{
+        const card = document.createElement('div');
+        card.className = 'photo-card';
+        card.innerHTML = '<div class="inner"><img src="'+url+'" alt="memory"><div class="shine"></div></div>';
+        galleryWrap.appendChild(card);
+        attachTilt(card.querySelector('.inner'));
+      });
+    } else {
+      gallerySection.style.display = 'none';
+    }
+ 
+    // memory
+    const memorySection = document.getElementById('memory-section');
+    if(data.memory){
+      memorySection.style.display = '';
+      document.getElementById('party-memory').textContent = data.memory;
+    } else {
+      memorySection.style.display = 'none';
+    }
+ 
+    if(ageInterval) clearInterval(ageInterval);
+    updateAge(dobDate);
+    ageInterval = setInterval(()=> updateAge(dobDate), 1000);
+ 
+    showScreen('party-screen');
+  }
+ 
+  function makePlaceholderAvatar(name){
+    const initial = (name || '?').trim().charAt(0).toUpperCase();
+    const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'>
+      <rect width='100%' height='100%' fill='#3a1f66'/>
+      <text x='50%' y='55%' font-size='140' font-family='sans-serif' fill='#ffcf5c' text-anchor='middle'>${initial}</text>
+    </svg>`;
+    return 'data:image/svg+xml;base64,' + btoa(svg);
+  }
+ 
+  function updateAge(dobDate){
     const now = new Date();
     let years = now.getFullYear() - dobDate.getFullYear();
-    const annivThisYear = new Date(now.getFullYear(), dobDate.getMonth(), dobDate.getDate());
-    if(now < annivThisYear) years--;
-
-    const lastAnniv = new Date(now.getFullYear(), dobDate.getMonth(), dobDate.getDate());
-    if(now < lastAnniv) lastAnniv.setFullYear(lastAnniv.getFullYear()-1);
-
-    const diffMs = now - lastAnniv;
-    const days = Math.floor(diffMs/86400000);
-    const hh = String(Math.floor((diffMs/3600000)%24)).padStart(2,'0');
-    const mm = String(Math.floor((diffMs/60000)%60)).padStart(2,'0');
-    const ss = String(Math.floor((diffMs/1000)%60)).padStart(2,'0');
-
-    document.getElementById('cYears').textContent = years;
-    document.getElementById('cDays').textContent = days;
-    document.getElementById('cTime').textContent = `${hh}:${mm}:${ss}`;
+    let anniversary = new Date(dobDate);
+    anniversary.setFullYear(dobDate.getFullYear() + years);
+    if(anniversary > now){
+      years--;
+      anniversary = new Date(dobDate);
+      anniversary.setFullYear(dobDate.getFullYear() + years);
+    }
+    let diffMs = now - anniversary;
+    const days = Math.floor(diffMs / 86400000);
+    diffMs -= days * 86400000;
+    const hours = Math.floor(diffMs / 3600000);
+    diffMs -= hours * 3600000;
+    const mins = Math.floor(diffMs / 60000);
+    diffMs -= mins * 60000;
+    const secs = Math.floor(diffMs / 1000);
+ 
+    document.getElementById('age-years').textContent = years;
+    document.getElementById('age-days').textContent = days;
+    document.getElementById('age-hours').textContent = String(hours).padStart(2,'0');
+    document.getElementById('age-mins').textContent = String(mins).padStart(2,'0');
+    document.getElementById('age-secs').textContent = String(secs).padStart(2,'0');
   }
-  tick();
-  ageInterval = setInterval(tick,1000);
-
-  document.getElementById('partyCopyBtn').onclick = ()=>{
-    navigator.clipboard.writeText(location.href).then(()=>{
-      document.getElementById('partyCopyBtn').textContent = 'Copied ✓';
-      setTimeout(()=>document.getElementById('partyCopyBtn').textContent='Copy this link',1500);
-    }).catch(()=>{});
-  };
-  document.getElementById('partyBackBtn').onclick = ()=>{
-    location.hash = '';
-    showScreen('loginScreen');
-  };
-}
-
-/* ============================================================
-   INIT / ROUTING
-============================================================ */
-(function init(){
-  const hash = location.hash;
-  if(hash.startsWith('#party=')){
-    try{
-      const data = decodeData(hash.slice(7));
-      renderParty(data);
-      showScreen('party');
+ 
+  /* ---------------- 4D tilt interaction ---------------- */
+  function attachTilt(el){
+    const maxTilt = 14;
+    el.addEventListener('mousemove', (e)=>{
+      const rect = el.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+      const rotateY = (x - 0.5) * maxTilt * 2;
+      const rotateX = (0.5 - y) * maxTilt * 2;
+      el.style.animation = 'none';
+      el.style.transform = `rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.04) translateZ(20px)`;
+    });
+    el.addEventListener('mouseleave', ()=>{
+      el.style.transform = '';
+      el.style.animation = '';
+    });
+  }
+ 
+  /* ---------------- boot ---------------- */
+  function boot(){
+    const hash = location.hash;
+    const match = hash.match(/party=([^&]+)/);
+    if(match){
+      renderParty(match[1]);
       return;
-    }catch(e){ console.error('Could not read link data', e); }
+    }
+    if(sessionStorage.getItem('codex_authed') === '1'){
+      showScreen('form-screen');
+    } else {
+      showScreen('login-screen');
+    }
   }
-  showScreen('loginScreen');
+  boot();
 })();
 </script>
 </body>
 </html>
+ 
