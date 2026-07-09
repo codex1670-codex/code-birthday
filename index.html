@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>code-x • 3D Birthday Party Generator</title>
+<title>code-x wishes</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -310,8 +310,6 @@
   }
   .footer-sig .dot{ width:6px; height:6px; border-radius:50%; background: var(--magenta); box-shadow: 0 0 10px var(--magenta); }
  
-  .party-actions{ margin-top: 10px; }
- 
   #not-found-screen .card{ max-width:420px; padding: 40px; text-align:center; }
  
   @media (max-width: 560px){
@@ -459,10 +457,6 @@
     </div>
  
     <div class="footer-sig"><span class="dot"></span> Made by code-x</div>
- 
-    <div class="party-actions">
-      <button class="btn-ghost" id="party-edit-btn" type="button">Edit this page</button>
-    </div>
   </div>
 </div>
  
@@ -670,8 +664,6 @@
     const id = (hash.match(/party=([^&]+)/) || [])[1];
     if(id) renderParty(id);
   });
-  document.getElementById('party-edit-btn').addEventListener('click', ()=> showScreen('form-screen'));
- 
   /* ---------------- party rendering ---------------- */
   let ageInterval = null;
  
