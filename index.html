@@ -2,578 +2,437 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>code-x — 3D Party Studio</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>code-x // birthday reveal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Poppins:wght@300;400;500;600&family=Space+Mono:wght@400;700&display=swap');
+  :root{
+    --bg-deep:#0a0a1f;
+    --bg-panel:#15132b;
+    --bg-panel-2:#1d1a3a;
+    --line:#332f5c;
+    --gold:#ffc94d;
+    --magenta:#ff4fa0;
+    --cyan:#4de1ff;
+    --text:#f3efff;
+    --muted:#a79fc9;
+    --danger:#ff5d6c;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;height:100%;}
+  body{
+    background:radial-gradient(1200px 800px at 50% -10%, #201c47 0%, var(--bg-deep) 55%, #050512 100%);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    overflow-x:hidden;
+    position:relative;
+  }
+  ::selection{background:var(--magenta);color:#fff;}
 
-:root{
-  --bg-deep:#0B0B1F;
-  --bg-deep2:#120C2B;
-  --card:rgba(255,255,255,0.055);
-  --card-border:rgba(255,255,255,0.12);
-  --pink:#FF2E92;
-  --gold:#FFD166;
-  --cyan:#4CF0FF;
-  --violet:#8A5CFF;
-  --text:#F5F3FF;
-  --text-dim:#A7A3C9;
-}
-*{box-sizing:border-box;}
-html,body{margin:0;padding:0;height:100%;}
-body{
-  background:
-    radial-gradient(circle at 15% 20%, rgba(138,92,255,0.18), transparent 45%),
-    radial-gradient(circle at 85% 15%, rgba(255,46,146,0.15), transparent 40%),
-    radial-gradient(circle at 50% 90%, rgba(76,240,255,0.10), transparent 45%),
-    linear-gradient(160deg, var(--bg-deep), var(--bg-deep2));
-  color:var(--text);
-  font-family:'Poppins',sans-serif;
-  min-height:100vh;
-  overflow-x:hidden;
-  position:relative;
-}
-#particleField{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden;}
-.spark{position:absolute;bottom:-20px;border-radius:50%;opacity:0.55;animation:floatUp linear infinite;}
-@keyframes floatUp{
-  0%{transform:translate3d(0,0,0) rotate(0deg);opacity:0;}
-  10%{opacity:0.6;}
-  90%{opacity:0.5;}
-  100%{transform:translate3d(var(--drift,20px),-115vh,0) rotate(360deg);opacity:0;}
-}
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:.18em;
+    text-transform:uppercase;
+    font-size:11px;
+    color:var(--cyan);
+    opacity:.85;
+  }
+  h1,h2,h3{font-family:'Unbounded',sans-serif;margin:0;}
 
-.screen{
-  position:relative;z-index:1;
-  min-height:100vh;
-  display:none;
-  align-items:center;
-  justify-content:center;
-  padding:40px 18px;
-}
-.screen.active{display:flex;}
+  /* ---------- confetti canvas ---------- */
+  #confetti{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;}
 
-/* ---------- shared card ---------- */
-.card{
-  background:var(--card);
-  border:1px solid var(--card-border);
-  backdrop-filter:blur(18px);
-  border-radius:28px;
-  box-shadow:0 30px 80px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.06);
-  padding:42px;
-  width:100%;
-}
-.eyebrow{
-  font-family:'Space Mono',monospace;
-  letter-spacing:3px;
-  font-size:11px;
-  color:var(--gold);
-  text-transform:uppercase;
-  margin-bottom:8px;
-  display:flex;align-items:center;gap:8px;
-}
-.eyebrow::before{content:'';width:18px;height:1px;background:var(--gold);display:inline-block;}
-h1.brand{
-  font-family:'Baloo 2',sans-serif;
-  font-weight:800;
-  font-size:34px;
-  margin:0 0 6px 0;
-  background:linear-gradient(90deg,var(--pink),var(--gold),var(--cyan));
-  -webkit-background-clip:text;background-clip:text;color:transparent;
-}
-p.sub{color:var(--text-dim);font-size:14.5px;line-height:1.6;margin:0 0 26px 0;}
+  .screen{
+    position:relative;z-index:1;
+    min-height:100vh;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:32px 16px;
+  }
+  .screen.active{display:flex;}
 
-/* ---------- login ---------- */
-#loginScreen .card{max-width:430px;}
-.tabs{display:flex;gap:6px;margin-bottom:26px;background:rgba(255,255,255,0.04);padding:5px;border-radius:14px;}
-.tab-btn{
-  flex:1;padding:10px 8px;border:none;background:transparent;color:var(--text-dim);
-  font-family:'Poppins';font-size:13px;font-weight:500;border-radius:10px;cursor:pointer;transition:.25s;
-}
-.tab-btn.active{background:linear-gradient(135deg,var(--violet),var(--pink));color:#fff;box-shadow:0 6px 18px rgba(255,46,146,0.35);}
+  /* ---------- shared panel ---------- */
+  .panel{
+    width:100%;max-width:460px;
+    background:linear-gradient(180deg, rgba(29,26,58,.9), rgba(21,19,43,.92));
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:32px 28px;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.03);
+    backdrop-filter:blur(6px);
+  }
+  .panel.wide{max-width:560px;}
 
-label{display:block;font-size:12.5px;color:var(--text-dim);margin:16px 0 7px;letter-spacing:.3px;}
-label:first-of-type{margin-top:0;}
-input[type=text],input[type=password],input[type=date],textarea{
-  width:100%;padding:13px 15px;border-radius:13px;border:1px solid var(--card-border);
-  background:rgba(255,255,255,0.05);color:var(--text);font-family:'Poppins';font-size:14.5px;
-  outline:none;transition:.2s;
-}
-input::placeholder,textarea::placeholder{color:#65618a;}
-input:focus,textarea:focus{border-color:var(--pink);box-shadow:0 0 0 3px rgba(255,46,146,0.15);}
-textarea{resize:vertical;min-height:56px;font-family:'Poppins';}
+  .brand{
+    display:flex;align-items:center;gap:10px;margin-bottom:22px;
+  }
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--magenta);box-shadow:0 0 12px var(--magenta);}
+  .brand span{font-family:'JetBrains Mono',monospace;font-size:13px;letter-spacing:.12em;color:var(--muted);}
 
-.btn{
-  border:none;cursor:pointer;font-family:'Baloo 2';font-weight:700;font-size:15.5px;
-  padding:14px 22px;border-radius:14px;color:#fff;letter-spacing:.3px;
-  background:linear-gradient(135deg,var(--pink),var(--violet));
-  box-shadow:0 12px 28px rgba(255,46,146,0.28);
-  transition:transform .18s ease, box-shadow .18s ease;
-  width:100%;
-}
-.btn:hover{transform:translateY(-2px);box-shadow:0 16px 34px rgba(255,46,146,0.4);}
-.btn:active{transform:translateY(0);}
-.btn.secondary{background:rgba(255,255,255,0.07);box-shadow:none;border:1px solid var(--card-border);}
-.btn.ghost{background:transparent;box-shadow:none;border:1px dashed var(--card-border);color:var(--text-dim);}
-.btn.small{width:auto;padding:9px 16px;font-size:13px;}
-.err{color:var(--pink);font-size:12.5px;margin-top:12px;min-height:14px;font-weight:500;}
+  label{
+    display:block;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--muted);margin:16px 0 6px;
+  }
+  label.first{margin-top:0;}
+  input[type=text],input[type=password],input[type=date],textarea{
+    width:100%;background:#0e0c22;border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:12px 14px;font-family:'Inter',sans-serif;font-size:14px;
+    outline:none;transition:border-color .15s, box-shadow .15s;
+  }
+  input:focus,textarea:focus{border-color:var(--cyan);box-shadow:0 0 0 3px rgba(77,225,255,.15);}
+  textarea{resize:vertical;min-height:90px;line-height:1.5;}
 
-/* ---------- create screen ---------- */
-#createScreen .card{max-width:640px;}
-.step-track{display:flex;gap:8px;margin-bottom:28px;}
-.step-dot{flex:1;height:5px;border-radius:4px;background:rgba(255,255,255,0.08);overflow:hidden;}
-.step-dot i{display:block;height:100%;width:0%;background:linear-gradient(90deg,var(--pink),var(--gold));transition:width .4s;}
-.step-dot.done i{width:100%;}
-.step-dot.active i{width:55%;}
+  .file-drop{
+    border:1.5px dashed var(--line);border-radius:12px;padding:16px;text-align:center;
+    cursor:pointer;transition:border-color .15s,background .15s;font-size:13px;color:var(--muted);
+  }
+  .file-drop:hover{border-color:var(--cyan);background:rgba(77,225,255,.05);}
+  .file-drop input{display:none;}
+  .thumbs{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+  .thumbs img{width:52px;height:52px;object-fit:cover;border-radius:8px;border:1px solid var(--line);}
 
-.step{display:none;}
-.step.active{display:block;animation:fadeSlide .35s ease;}
-@keyframes fadeSlide{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+  button.primary{
+    width:100%;margin-top:22px;padding:13px 18px;border:none;border-radius:10px;cursor:pointer;
+    font-family:'Unbounded',sans-serif;font-weight:600;font-size:14px;letter-spacing:.02em;
+    background:linear-gradient(135deg,var(--magenta),var(--gold));color:#1a0a12;
+    box-shadow:0 10px 24px -8px rgba(255,79,160,.55);
+    transition:transform .15s, box-shadow .15s;
+  }
+  button.primary:hover{transform:translateY(-1px);box-shadow:0 14px 28px -8px rgba(255,79,160,.7);}
+  button.primary:active{transform:translateY(0);}
+  button.ghost{
+    width:100%;margin-top:10px;padding:11px 18px;border-radius:10px;cursor:pointer;
+    background:transparent;border:1px solid var(--line);color:var(--muted);
+    font-family:'JetBrains Mono',monospace;font-size:12px;letter-spacing:.05em;
+  }
+  button.ghost:hover{border-color:var(--cyan);color:var(--cyan);}
 
-.upload-box{
-  border:1.5px dashed var(--card-border);border-radius:18px;padding:26px;text-align:center;
-  cursor:pointer;transition:.2s;background:rgba(255,255,255,0.03);position:relative;
-}
-.upload-box:hover{border-color:var(--cyan);background:rgba(76,240,255,0.05);}
-.upload-box input{display:none;}
-.upload-box .icon{font-size:26px;display:block;margin-bottom:6px;}
-.hero-preview{width:100px;height:100px;border-radius:50%;object-fit:cover;margin:0 auto 12px;border:2px solid var(--gold);box-shadow:0 0 22px rgba(255,209,102,0.35);display:none;}
+  .error-msg{color:var(--danger);font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:10px;min-height:14px;}
+  .hint{color:var(--muted);font-size:12px;margin-top:6px;line-height:1.5;}
 
-.gallery-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:10px;margin-top:14px;}
-.gallery-thumb{position:relative;border-radius:12px;overflow:hidden;aspect-ratio:1;border:1px solid var(--card-border);}
-.gallery-thumb img{width:100%;height:100%;object-fit:cover;display:block;}
-.gallery-thumb .rm{position:absolute;top:3px;right:3px;background:rgba(0,0,0,0.6);color:#fff;width:20px;height:20px;border-radius:50%;border:none;font-size:11px;cursor:pointer;line-height:20px;}
+  .link-box{
+    margin-top:18px;background:#0e0c22;border:1px solid var(--line);border-radius:10px;
+    padding:12px 14px;font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--cyan);
+    word-break:break-all;
+  }
 
-.mem-row{display:flex;gap:8px;margin-bottom:9px;align-items:center;}
-.mem-row textarea{flex:1;}
-.mem-row .rm{background:rgba(255,46,146,0.12);color:var(--pink);border:none;width:32px;height:32px;flex:0 0 32px;border-radius:10px;cursor:pointer;font-size:15px;}
+  /* ================= PARTY SCREEN ================= */
+  #partyScreen{
+    display:none;position:relative;min-height:100vh;flex-direction:column;
+    align-items:center;padding:60px 16px 40px;perspective:1400px;
+  }
+  #partyScreen.active{display:flex;}
 
-.nav-row{display:flex;gap:10px;margin-top:26px;}
-.nav-row .btn{flex:1;}
+  .stage-header{text-align:center;margin-bottom:8px;}
+  .stage-header .eyebrow{display:block;margin-bottom:6px;}
 
-/* ---------- generated screen ---------- */
-#genScreen .card{max-width:480px;text-align:center;}
-.gen-icon{font-size:44px;margin-bottom:6px;}
-.code-box{
-  font-family:'Space Mono',monospace;font-size:22px;letter-spacing:5px;font-weight:700;
-  background:rgba(255,255,255,0.05);border:1px solid var(--card-border);border-radius:14px;
-  padding:16px;margin:18px 0;color:var(--gold);word-break:break-all;
-}
-.code-box.small{font-size:14px;letter-spacing:3px;padding:10px;margin:6px 0 4px;color:var(--text-dim);}
-.link-box{
-  font-family:'Space Mono',monospace;font-size:13px;line-height:1.6;font-weight:400;
-  background:rgba(76,240,255,0.06);border:1px solid rgba(76,240,255,0.3);border-radius:14px;
-  padding:16px;margin:18px 0 4px;color:var(--cyan);word-break:break-all;text-align:left;
-}
-.hint{font-size:12.5px;color:var(--text-dim);margin-top:16px;line-height:1.7;}
-.gen-actions{display:flex;flex-direction:column;gap:10px;margin-top:18px;}
+  /* --- 3D avatar plaque --- */
+  .avatar-stage{
+    width:220px;height:220px;margin:26px auto 18px;perspective:900px;
+  }
+  .avatar-frame{
+    width:100%;height:100%;position:relative;transform-style:preserve-3d;
+    animation:avatarSpin 9s ease-in-out infinite;
+    border-radius:50%;
+  }
+  @keyframes avatarSpin{
+    0%,100%{transform:rotateY(-14deg) rotateX(4deg);}
+    50%{transform:rotateY(14deg) rotateX(-4deg);}
+  }
+  .avatar-ring{
+    position:absolute;inset:0;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--magenta),var(--gold),var(--cyan),var(--magenta));
+    filter:blur(2px);
+    animation:spin 6s linear infinite;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .avatar-photo{
+    position:absolute;inset:7px;border-radius:50%;overflow:hidden;
+    box-shadow:0 20px 40px -10px rgba(0,0,0,.7), inset 0 0 0 3px rgba(10,10,31,.9);
+    background:#0e0c22;
+  }
+  .avatar-photo img{width:100%;height:100%;object-fit:cover;display:block;}
 
-/* ================= PARTY VIEW ================= */
-#partyScreen{padding:0;display:none;min-height:100vh;flex-direction:column;align-items:center;perspective:1400px;}
-#partyScreen.active{display:flex;}
-.party-bg{position:fixed;inset:0;z-index:0;background:
-    radial-gradient(circle at 20% 10%, rgba(255,46,146,0.16), transparent 40%),
-    radial-gradient(circle at 80% 25%, rgba(76,240,255,0.14), transparent 42%),
-    radial-gradient(circle at 50% 100%, rgba(138,92,255,0.20), transparent 50%),
-    var(--bg-deep);}
-.party-wrap{position:relative;z-index:1;width:100%;max-width:980px;padding:50px 20px 90px;}
-.exit-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.exit-bar a{color:var(--text-dim);font-size:12.5px;text-decoration:none;font-family:'Space Mono';cursor:pointer;}
-.exit-bar a:hover{color:var(--cyan);}
+  .person-name{
+    font-size:clamp(26px,5vw,40px);text-align:center;margin-top:8px;
+    background:linear-gradient(90deg,var(--gold),var(--magenta));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    text-shadow:0 0 40px rgba(255,79,160,.25);
+  }
+  .person-sub{text-align:center;color:var(--muted);font-family:'JetBrains Mono',monospace;font-size:12px;margin-top:4px;letter-spacing:.05em;}
 
-/* medallion */
-.medallion-stage{display:flex;justify-content:center;padding:30px 0 10px;}
-.medallion{position:relative;width:230px;height:230px;transform-style:preserve-3d;animation:medallionFloat 6s ease-in-out infinite;}
-@keyframes medallionFloat{0%,100%{transform:translateY(0) rotateZ(0deg);}50%{transform:translateY(-14px) rotateZ(1.5deg);}}
-.ring{position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 0deg,var(--pink),var(--gold),var(--cyan),var(--violet),var(--pink));animation:spinRing 9s linear infinite;filter:blur(0.3px);}
-@keyframes spinRing{to{transform:rotate(360deg);}}
-.ring::after{content:'';position:absolute;inset:8px;border-radius:50%;background:var(--bg-deep);}
-.medallion-photo{position:absolute;inset:16px;border-radius:50%;overflow:hidden;box-shadow:0 0 40px rgba(255,209,102,0.35), inset 0 0 0 3px rgba(255,255,255,0.15);}
-.medallion-photo img{width:100%;height:100%;object-fit:cover;}
-.orbit{position:absolute;inset:-28px;animation:spinRing 14s linear infinite reverse;}
-.orbit span{position:absolute;font-size:20px;filter:drop-shadow(0 0 6px rgba(255,255,255,0.25));}
+  /* --- live DOB counter --- */
+  .counter-plaque{
+    margin:26px auto 6px;max-width:640px;width:100%;
+    background:linear-gradient(180deg,rgba(29,26,58,.75),rgba(14,12,34,.85));
+    border:1px solid var(--line);border-radius:16px;padding:20px 18px;
+    display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+    box-shadow:0 20px 40px -20px rgba(0,0,0,.6);
+  }
+  .counter-cell{text-align:center;}
+  .counter-num{
+    font-family:'JetBrains Mono',monospace;font-weight:700;font-size:clamp(20px,4vw,30px);
+    color:var(--cyan);text-shadow:0 0 18px rgba(77,225,255,.5);
+  }
+  .counter-label{font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-top:4px;}
 
-.hero-name{
-  text-align:center;font-family:'Baloo 2';font-weight:800;font-size:40px;margin:18px 0 2px;
-  background:linear-gradient(90deg,var(--gold),var(--pink),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent;
-}
-.hero-tag{text-align:center;color:var(--text-dim);font-family:'Space Mono';font-size:12px;letter-spacing:2px;text-transform:uppercase;margin-bottom:36px;}
+  /* --- section titles --- */
+  .section-title{
+    margin:44px 0 6px;text-align:center;font-size:20px;
+  }
+  .section-sub{text-align:center;color:var(--muted);font-size:12px;font-family:'JetBrains Mono',monospace;margin-bottom:18px;}
 
-/* live age */
-.age-panel{
-  background:var(--card);border:1px solid var(--card-border);border-radius:24px;padding:26px 20px;
-  backdrop-filter:blur(16px);margin-bottom:46px;transform-style:preserve-3d;
-  box-shadow:0 25px 60px rgba(0,0,0,0.4);
-}
-.age-title{text-align:center;font-family:'Space Mono';font-size:11px;letter-spacing:3px;color:var(--cyan);text-transform:uppercase;margin-bottom:18px;}
-.age-grid{display:flex;justify-content:center;gap:14px;flex-wrap:wrap;}
-.age-cell{
-  background:rgba(255,255,255,0.04);border:1px solid var(--card-border);border-radius:16px;
-  padding:16px 20px;min-width:88px;text-align:center;
-  animation:cellFloat 4s ease-in-out infinite;
-}
-.age-cell:nth-child(2){animation-delay:.3s;}
-.age-cell:nth-child(3){animation-delay:.6s;}
-.age-cell:nth-child(4){animation-delay:.9s;}
-.age-cell:nth-child(5){animation-delay:1.2s;}
-@keyframes cellFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-6px);}}
-.age-num{font-family:'Space Mono';font-weight:700;font-size:26px;color:var(--gold);text-shadow:0 0 18px rgba(255,209,102,0.4);}
-.age-lbl{font-size:10.5px;color:var(--text-dim);letter-spacing:1.5px;margin-top:4px;text-transform:uppercase;}
+  /* --- floating gallery (4D) --- */
+  .gallery{
+    width:100%;max-width:900px;display:flex;flex-wrap:wrap;justify-content:center;
+    gap:26px;padding:20px 10px 10px;perspective:1200px;
+  }
+  .float-card{
+    width:150px;height:190px;border-radius:14px;overflow:hidden;position:relative;
+    transform-style:preserve-3d;cursor:pointer;
+    background:#0e0c22;border:1px solid var(--line);
+    box-shadow:0 18px 36px -14px rgba(0,0,0,.65);
+    animation:floatY 5.5s ease-in-out infinite;
+    transition:transform .15s ease-out;
+  }
+  .float-card img{width:100%;height:100%;object-fit:cover;display:block;opacity:.95;}
+  .float-card::after{
+    content:'';position:absolute;inset:0;border-radius:14px;
+    box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);
+    background:linear-gradient(180deg,transparent 60%,rgba(0,0,0,.55));
+  }
+  @keyframes floatY{
+    0%,100%{transform:translateY(0) rotateZ(-1.5deg);}
+    50%{transform:translateY(-16px) rotateZ(1.5deg);}
+  }
 
-/* section title */
-.sec-title{
-  font-family:'Baloo 2';font-weight:700;font-size:22px;margin:0 0 6px;
-  display:flex;align-items:center;gap:10px;
-}
-.sec-sub{color:var(--text-dim);font-size:12.5px;margin-bottom:22px;}
+  /* --- floating messages --- */
+  .messages{
+    width:100%;max-width:820px;display:flex;flex-wrap:wrap;justify-content:center;
+    gap:18px;padding:10px 10px 20px;
+  }
+  .msg-bubble{
+    background:linear-gradient(160deg,rgba(255,201,77,.14),rgba(255,79,160,.10));
+    border:1px solid rgba(255,201,77,.35);
+    border-radius:16px 16px 16px 4px;
+    padding:16px 18px;max-width:280px;font-size:14px;line-height:1.55;color:var(--text);
+    transform-style:preserve-3d;
+    animation:msgFloat 6s ease-in-out infinite;
+    box-shadow:0 16px 34px -16px rgba(0,0,0,.6);
+  }
+  @keyframes msgFloat{
+    0%,100%{transform:translateY(0) rotateX(0deg) rotateY(0deg);}
+    50%{transform:translateY(-10px) rotateX(3deg) rotateY(-3deg);}
+  }
 
-/* photo gallery 4D */
-.gallery-4d{
-  display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:22px;margin-bottom:52px;
-  perspective:1000px;
-}
-.g-card{
-  position:relative;border-radius:20px;overflow:hidden;aspect-ratio:4/5;
-  border:1px solid var(--card-border);transform-style:preserve-3d;cursor:pointer;
-  transition:transform .12s ease;box-shadow:0 18px 40px rgba(0,0,0,0.4);
-  animation:gFloat 5s ease-in-out infinite;
-}
-@keyframes gFloat{0%,100%{transform:translateY(0) rotateZ(0deg);}50%{transform:translateY(-8px) rotateZ(.6deg);}}
-.g-card img{width:100%;height:100%;object-fit:cover;display:block;}
-.g-card::after{content:'';position:absolute;inset:0;background:linear-gradient(200deg,transparent 55%,rgba(0,0,0,0.55));pointer-events:none;}
-.g-card .glow{position:absolute;inset:0;border-radius:20px;box-shadow:inset 0 0 0 1px rgba(255,255,255,0.15), 0 0 0 0 rgba(255,46,146,0);transition:box-shadow .25s;}
-.g-card:hover .glow{box-shadow:inset 0 0 0 1px rgba(255,255,255,0.25), 0 0 32px 4px rgba(255,46,146,0.35);}
+  footer.made-by{
+    margin-top:50px;margin-bottom:14px;text-align:center;
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--muted);
+  }
+  footer.made-by span{color:var(--gold);}
 
-/* messages floating 3D */
-.msg-stage{position:relative;min-height:340px;margin-bottom:20px;perspective:1200px;}
-.bubble{
-  background:linear-gradient(150deg, rgba(255,255,255,0.09), rgba(255,255,255,0.03));
-  border:1px solid var(--card-border);border-radius:20px 20px 20px 4px;
-  padding:18px 20px;max-width:250px;backdrop-filter:blur(10px);
-  box-shadow:0 20px 45px rgba(0,0,0,0.45);
-  animation:bubbleFloat 6s ease-in-out infinite;
-  transform-style:preserve-3d;font-size:14px;line-height:1.55;color:var(--text);
-}
-.bubble .quote{color:var(--gold);font-size:20px;line-height:0;position:relative;top:8px;margin-right:2px;}
-@keyframes bubbleFloat{
-  0%,100%{transform:translateY(0) rotate3d(1,1,0,0deg);}
-  50%{transform:translateY(-12px) rotate3d(1,1,0,4deg);}
-}
+  .share-strip{
+    margin-top:8px;width:100%;max-width:640px;display:flex;gap:8px;flex-wrap:wrap;justify-content:center;
+  }
+  .share-strip button{
+    font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.04em;
+    background:transparent;border:1px solid var(--line);color:var(--muted);
+    padding:9px 14px;border-radius:8px;cursor:pointer;
+  }
+  .share-strip button:hover{border-color:var(--cyan);color:var(--cyan);}
 
-.footer-made{
-  text-align:center;margin-top:50px;font-family:'Space Mono';font-size:12px;letter-spacing:2px;
-  color:var(--text-dim);
-}
-.footer-made b{background:linear-gradient(90deg,var(--pink),var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  @media (prefers-reduced-motion: reduce){
+    .avatar-frame,.avatar-ring,.float-card,.msg-bubble{animation:none !important;}
+  }
 
-.field-row{display:flex;gap:12px;}
-.field-row > div{flex:1;}
-@media(max-width:520px){
-  .card{padding:28px 22px;}
-  .hero-name{font-size:30px;}
-  .medallion{width:180px;height:180px;}
-}
+  @media (max-width:480px){
+    .counter-plaque{grid-template-columns:repeat(3,1fr);gap:8px;padding:16px 10px;}
+    .panel{padding:26px 18px;}
+  }
 </style>
 </head>
 <body>
 
-<div id="particleField"></div>
+<canvas id="confetti"></canvas>
 
-<!-- ================= LOGIN / JOIN ================= -->
+<!-- ============ LOGIN SCREEN ============ -->
 <div class="screen active" id="loginScreen">
-  <div class="card">
-    <div class="eyebrow">code-x studio</div>
-    <h1 class="brand">3D Party Studio</h1>
-    <p class="sub">Build a private, shareable 3D birthday experience — a floating avatar, a live-ticking age, a 4D photo gallery and floating memories.</p>
+  <div class="panel">
+    <div class="brand"><div class="dot"></div><span>ACCESS // CODE-X</span></div>
+    <h2 style="font-size:22px;">Private surprise console</h2>
+    <p class="hint">Enter the access credentials to build a 3D birthday reveal.</p>
 
-    <div class="tabs">
-      <button class="tab-btn active" id="tabHost" onclick="switchTab('host')">Host login</button>
-      <button class="tab-btn" id="tabJoin" onclick="switchTab('join')">I have an invite code</button>
-    </div>
+    <label class="first">Username</label>
+    <input type="text" id="loginUser" autocomplete="off" placeholder="username">
 
-    <div id="hostPane">
-      <label>Username</label>
-      <input type="text" id="username" placeholder="code-x" autocomplete="off">
-      <label>Password</label>
-      <input type="password" id="password" placeholder="••••••••">
-      <div style="margin-top:22px;">
-        <button class="btn" onclick="tryLogin()">Enter studio</button>
-      </div>
-      <div class="err" id="loginErr"></div>
-    </div>
+    <label>Password</label>
+    <input type="password" id="loginPass" placeholder="password">
 
-    <div id="joinPane" style="display:none;">
-      <label>Invite code</label>
-      <input type="text" id="joinCode" placeholder="e.g. 7F3KQ2" style="text-transform:uppercase;">
-      <div style="margin-top:22px;">
-        <button class="btn secondary" onclick="tryJoin()">Open the party</button>
-      </div>
-      <div class="err" id="joinErr"></div>
-    </div>
+    <div class="error-msg" id="loginError"></div>
+    <button class="primary" id="loginBtn">Unlock console</button>
   </div>
 </div>
 
-<!-- ================= CREATE PARTY ================= -->
+<!-- ============ CREATE SCREEN ============ -->
 <div class="screen" id="createScreen">
-  <div class="card">
-    <div class="eyebrow">step <span id="stepNum">1</span> of 4</div>
-    <h1 class="brand" style="font-size:26px;">Design the celebration</h1>
-    <p class="sub" style="margin-bottom:18px;">Every detail here becomes part of the generated 3D page.</p>
+  <div class="panel wide">
+    <div class="brand"><div class="dot"></div><span>CODE-X // BUILD REVEAL</span></div>
+    <h2 style="font-size:22px;">Assemble the surprise</h2>
+    <p class="hint">Everything here is packed into one private link. Nothing is uploaded anywhere.</p>
 
-    <div class="step-track">
-      <div class="step-dot active" id="dot1"><i></i></div>
-      <div class="step-dot" id="dot2"><i></i></div>
-      <div class="step-dot" id="dot3"><i></i></div>
-      <div class="step-dot" id="dot4"><i></i></div>
+    <label class="first">Main photo (for the 3D avatar)</label>
+    <div class="file-drop" id="mainPhotoDrop">
+      <input type="file" id="mainPhoto" accept="image/*">
+      <span id="mainPhotoLabel">Tap to choose a photo</span>
     </div>
+    <div class="thumbs" id="mainPhotoThumb"></div>
 
-    <!-- step 1: hero photo + name + dob -->
-    <div class="step active" id="step1">
-      <label>Hero photo (the main portrait)</label>
-      <div class="upload-box" onclick="document.getElementById('heroInput').click()">
-        <img id="heroPreview" class="hero-preview">
-        <span class="icon" id="heroIcon">🎂</span>
-        <div id="heroLabel">Click to upload their photo</div>
-        <input type="file" id="heroInput" accept="image/*" onchange="handleHero(event)">
-      </div>
+    <label>Name</label>
+    <input type="text" id="personName" placeholder="e.g. Sanjiv">
 
-      <div class="field-row">
-        <div>
-          <label>Full name</label>
-          <input type="text" id="pName" placeholder="Sanjiv">
-        </div>
-        <div>
-          <label>Date of birth</label>
-          <input type="date" id="pDob">
-        </div>
-      </div>
-      <div class="err" id="step1Err"></div>
-      <div class="nav-row"><button class="btn" onclick="goStep(2)">Continue</button></div>
+    <label>Date of birth</label>
+    <input type="date" id="personDOB">
+
+    <label>Memories / messages</label>
+    <textarea id="memoryText" placeholder="Write a few lines or memories — one per line works great, each becomes its own floating message."></textarea>
+
+    <label>Memory photos (multiple)</label>
+    <div class="file-drop" id="memPhotoDrop">
+      <input type="file" id="memPhotos" accept="image/*" multiple>
+      <span id="memPhotoLabel">Tap to choose photos</span>
     </div>
+    <div class="thumbs" id="memPhotoThumb"></div>
+    <div class="hint">Tip: 3–8 lightly-sized photos keep the shareable link fast to open.</div>
 
-    <!-- step 2: memories -->
-    <div class="step" id="step2">
-      <label>Memories &amp; wishes</label>
-      <p class="sub" style="margin-bottom:12px;">Add a few short lines — each becomes a floating 3D message.</p>
-      <div id="memList"></div>
-      <button class="btn ghost small" onclick="addMemoryRow()">+ Add memory</button>
-      <div class="nav-row">
-        <button class="btn secondary" onclick="goStep(1)">Back</button>
-        <button class="btn" onclick="goStep(3)">Continue</button>
-      </div>
-    </div>
+    <div class="error-msg" id="createError"></div>
+    <button class="primary" id="generateBtn">Generate private link</button>
 
-    <!-- step 3: gallery photos -->
-    <div class="step" id="step3">
-      <label>Memory photos (multiple)</label>
-      <div class="upload-box" onclick="document.getElementById('galleryInput').click()">
-        <span class="icon">🖼️</span>
-        <div>Click to add photos for the 4D gallery</div>
-        <input type="file" id="galleryInput" accept="image/*" multiple onchange="handleGallery(event)">
-      </div>
-      <div class="gallery-grid" id="galleryGrid"></div>
-      <div class="nav-row">
-        <button class="btn secondary" onclick="goStep(2)">Back</button>
-        <button class="btn" onclick="goStep(4)">Continue</button>
-      </div>
-    </div>
-
-    <!-- step 4: review + generate -->
-    <div class="step" id="step4">
-      <label>Ready to generate</label>
-      <p class="sub">We'll bundle the photo, name, live birthday clock, gallery and messages into one private, shareable page.</p>
-      <div class="nav-row">
-        <button class="btn secondary" onclick="goStep(3)">Back</button>
-        <button class="btn" id="generateBtn" onclick="generateParty()">🎉 Generate party link</button>
-      </div>
-      <div class="err" id="genErr"></div>
+    <div id="linkResult" style="display:none;">
+      <div class="link-box" id="linkBox"></div>
+      <button class="ghost" id="copyLinkBtn">Copy link</button>
+      <button class="ghost" id="openLinkBtn">Open the reveal →</button>
     </div>
   </div>
 </div>
 
-<!-- ================= GENERATED LINK ================= -->
-<div class="screen" id="genScreen">
-  <div class="card">
-    <div class="gen-icon">🎊</div>
-    <h1 class="brand" style="font-size:24px;">Party generated!</h1>
-    <p class="sub">Here's the private shareable link. Anyone who opens it lands straight on the 3D celebration — no login needed.</p>
-    <div class="link-box" id="genLink">generating…</div>
-    <div class="code-box small" id="genCode">------</div>
-    <div class="gen-actions">
-      <button class="btn" id="copyLinkBtn" onclick="copyLink()">📋 Copy shareable link</button>
-      <button class="btn secondary" onclick="previewParty()">Preview the party →</button>
-      <button class="btn ghost" onclick="backToLogin()">Back to studio</button>
-    </div>
-    <div class="hint">Made by code-x · the link (and the fallback invite code beneath it) both open this exact party, privately.</div>
-  </div>
-</div>
-
-<!-- ================= PARTY VIEW ================= -->
-<div class="screen" id="partyScreen">
-  <div class="party-bg"></div>
-  <div class="party-wrap">
-    <div class="exit-bar">
-      <a onclick="backToLogin()">← code-x studio</a>
-      <a id="partyCodeTag"></a>
-    </div>
-
-    <div class="medallion-stage">
-      <div class="medallion">
-        <div class="ring"></div>
-        <div class="medallion-photo"><img id="viewHeroImg" src=""></div>
-        <div class="orbit" id="orbitLayer"></div>
+<!-- ============ PARTY / REVEAL SCREEN ============ -->
+<div id="partyScreen">
+  <div class="stage-header">
+    <span class="eyebrow">a private reveal · code-x</span>
+    <div class="avatar-stage">
+      <div class="avatar-frame">
+        <div class="avatar-ring"></div>
+        <div class="avatar-photo"><img id="partyMainPhoto" src="" alt=""></div>
       </div>
     </div>
-    <div class="hero-name" id="viewName">—</div>
-    <div class="hero-tag">A 3D celebration, generated by code-x</div>
-
-    <div class="age-panel">
-      <div class="age-title">✦ Alive since ✦</div>
-      <div class="age-grid" id="ageGrid">
-        <div class="age-cell"><div class="age-num" id="ageYears">0</div><div class="age-lbl">Years</div></div>
-        <div class="age-cell"><div class="age-num" id="ageDays">0</div><div class="age-lbl">Days</div></div>
-        <div class="age-cell"><div class="age-num" id="ageHours">00</div><div class="age-lbl">Hours</div></div>
-        <div class="age-cell"><div class="age-num" id="ageMins">00</div><div class="age-lbl">Minutes</div></div>
-        <div class="age-cell"><div class="age-num" id="ageSecs">00</div><div class="age-lbl">Seconds</div></div>
-      </div>
-    </div>
-
-    <div class="sec-title">🖼️ Moments <span style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';font-weight:400;">// 4D gallery</span></div>
-    <div class="sec-sub">Tilt-reactive, ever-floating photo frames.</div>
-    <div class="gallery-4d" id="galleryView"></div>
-
-    <div class="sec-title">💬 Messages <span style="font-size:12px;color:var(--text-dim);font-family:'Space Mono';font-weight:400;">// floating in 3D</span></div>
-    <div class="sec-sub">Wishes and memories, drifting gently.</div>
-    <div class="msg-stage" id="msgStage"></div>
-
-    <div class="footer-made">made with 🎉 by <b>code-x</b></div>
+    <h1 class="person-name" id="partyName">—</h1>
+    <div class="person-sub" id="partyDobLabel">DOB —</div>
   </div>
+
+  <div class="counter-plaque">
+    <div class="counter-cell"><div class="counter-num" id="cYears">0</div><div class="counter-label">Years alive</div></div>
+    <div class="counter-cell"><div class="counter-num" id="cDays">0</div><div class="counter-label">Days since last bday</div></div>
+    <div class="counter-cell"><div class="counter-num" id="cTime">00:00:00</div><div class="counter-label">Live time</div></div>
+  </div>
+
+  <h3 class="section-title">Moments <span style="color:var(--gold)">·</span> 4D gallery</h3>
+  <div class="section-sub">tap or hover — every photo floats on its own</div>
+  <div class="gallery" id="gallery"></div>
+
+  <h3 class="section-title">Messages <span style="color:var(--magenta)">·</span> floating in 3D</h3>
+  <div class="messages" id="messages"></div>
+
+  <div class="share-strip">
+    <button id="partyCopyBtn">Copy this link</button>
+    <button id="partyBackBtn">Build another</button>
+  </div>
+
+  <footer class="made-by">crafted with <span>code-x</span></footer>
 </div>
 
 <script>
-/* ---------------- ambient particles ---------------- */
-(function(){
-  const field = document.getElementById('particleField');
-  const emojis = ['✨','🎈','🎉','⭐'];
-  for(let i=0;i<26;i++){
-    const s = document.createElement('div');
-    s.className='spark';
-    s.style.left = Math.random()*100+'vw';
-    s.style.fontSize = (10+Math.random()*14)+'px';
-    s.style.setProperty('--drift',(Math.random()*140-70)+'px');
-    s.style.animationDuration = (10+Math.random()*14)+'s';
-    s.style.animationDelay = (Math.random()*14)+'s';
-    s.textContent = Math.random()>0.4 ? emojis[Math.floor(Math.random()*emojis.length)] : '';
-    if(!s.textContent){
-      s.style.width=s.style.height=(3+Math.random()*4)+'px';
-      s.style.background=['#FF2E92','#FFD166','#4CF0FF','#8A5CFF'][Math.floor(Math.random()*4)];
-    }
-    field.appendChild(s);
-  }
-})();
+/* ============================================================
+   CONFETTI BACKGROUND
+============================================================ */
+const canvas = document.getElementById('confetti');
+const ctx = canvas.getContext('2d');
+let W,H;
+function resize(){ W=canvas.width=window.innerWidth; H=canvas.height=window.innerHeight; }
+window.addEventListener('resize',resize); resize();
 
-/* ---------------- state ---------------- */
-let partyData = { name:'', dob:'', hero:'', memories:[], photos:[] };
-let currentPreviewCode = null;
+const colors=['#ffc94d','#ff4fa0','#4de1ff','#ffffff'];
+const particles = Array.from({length:70},()=>({
+  x:Math.random()*W, y:Math.random()*H - H,
+  size:3+Math.random()*5, speed:0.6+Math.random()*1.4,
+  drift:(Math.random()-0.5)*0.6, rot:Math.random()*360,
+  rotSpeed:(Math.random()-0.5)*2, color:colors[Math.floor(Math.random()*colors.length)]
+}));
+function loop(){
+  ctx.clearRect(0,0,W,H);
+  particles.forEach(p=>{
+    p.y += p.speed; p.x += p.drift; p.rot += p.rotSpeed;
+    if(p.y > H+10){ p.y = -10; p.x = Math.random()*W; }
+    ctx.save();
+    ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+    ctx.fillStyle = p.color; ctx.globalAlpha = 0.55;
+    ctx.fillRect(-p.size/2,-p.size/2,p.size,p.size*0.5);
+    ctx.restore();
+  });
+  requestAnimationFrame(loop);
+}
+loop();
 
+/* ============================================================
+   SCREEN HELPERS
+============================================================ */
 function showScreen(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  window.scrollTo(0,0);
+  document.getElementById('partyScreen').classList.remove('active');
+  if(id==='party'){
+    document.getElementById('partyScreen').classList.add('active');
+  } else {
+    document.getElementById(id).classList.add('active');
+  }
 }
 
-/* ---------------- login tabs ---------------- */
-function switchTab(which){
-  const host = which==='host';
-  document.getElementById('tabHost').classList.toggle('active',host);
-  document.getElementById('tabJoin').classList.toggle('active',!host);
-  document.getElementById('hostPane').style.display = host?'block':'none';
-  document.getElementById('joinPane').style.display = host?'none':'block';
-}
-
-function tryLogin(){
-  const u = document.getElementById('username').value.trim().toLowerCase();
-  const p = document.getElementById('password').value.trim();
-  const err = document.getElementById('loginErr');
-  if(u==='code-x' && p==='sanjiv'){
+/* ============================================================
+   LOGIN
+============================================================ */
+document.getElementById('loginBtn').addEventListener('click', ()=>{
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value;
+  const err = document.getElementById('loginError');
+  if(u === 'code-x' && p === 'sanjiv'){
     err.textContent='';
-    resetForm();
     showScreen('createScreen');
   } else {
-    err.textContent = 'Incorrect username or password.';
+    err.textContent = 'Access denied — check username and password.';
   }
-}
+});
+document.getElementById('loginPass').addEventListener('keydown', e=>{
+  if(e.key==='Enter') document.getElementById('loginBtn').click();
+});
 
-async function tryJoin(){
-  const code = document.getElementById('joinCode').value.trim().toUpperCase();
-  const err = document.getElementById('joinErr');
-  if(!code){ err.textContent='Enter an invite code.'; return; }
-  err.textContent = 'Opening…';
-  try{
-    const res = await window.storage.get('codex-party-'+code, true);
-    if(!res){ err.textContent='No party found for that code.'; return; }
-    const data = JSON.parse(res.value);
-    err.textContent='';
-    renderParty(data, code);
-    showScreen('partyScreen');
-  }catch(e){
-    err.textContent = 'No party found for that code.';
-  }
-}
-
-function backToLogin(){
-  showScreen('loginScreen');
-}
-
-/* ---------------- create flow ---------------- */
-function resetForm(){
-  partyData = { name:'', dob:'', hero:'', memories:[], photos:[] };
-  document.getElementById('pName').value='';
-  document.getElementById('pDob').value='';
-  document.getElementById('heroPreview').style.display='none';
-  document.getElementById('heroIcon').style.display='inline';
-  document.getElementById('heroLabel').textContent='Click to upload their photo';
-  document.getElementById('memList').innerHTML='';
-  document.getElementById('galleryGrid').innerHTML='';
-  addMemoryRow(); addMemoryRow();
-  goStep(1,true);
-}
-
-function goStep(n, silent){
-  if(!silent && n>1){
-    // validate step 1 before leaving it
-    if(document.getElementById('step1').classList.contains('active')){
-      const name = document.getElementById('pName').value.trim();
-      const dob = document.getElementById('pDob').value;
-      const err = document.getElementById('step1Err');
-      if(!partyData.hero){ err.textContent='Please upload a hero photo.'; return; }
-      if(!name){ err.textContent='Please enter a name.'; return; }
-      if(!dob){ err.textContent='Please pick a date of birth.'; return; }
-      err.textContent='';
-      partyData.name = name; partyData.dob = dob;
-    }
-  }
-  for(let i=1;i<=4;i++){
-    document.getElementById('step'+i).classList.toggle('active', i===n);
-    const dot = document.getElementById('dot'+i);
-    dot.classList.toggle('active', i===n);
-    dot.classList.toggle('done', i<n);
-  }
-  document.getElementById('stepNum').textContent = n;
-}
-
-function resizeImage(file, maxDim, quality){
+/* ============================================================
+   FILE HANDLING (resize to keep link small)
+============================================================ */
+function resizeImageFile(file, maxDim, quality){
   return new Promise((resolve,reject)=>{
     const reader = new FileReader();
     reader.onload = e=>{
       const img = new Image();
       img.onload = ()=>{
-        let w = img.width, h = img.height;
-        if(w>h && w>maxDim){ h = h*maxDim/w; w = maxDim; }
-        else if(h>maxDim){ w = w*maxDim/h; h = maxDim; }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img,0,0,w,h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
+        let {width,height} = img;
+        if(width > height && width > maxDim){ height = height*(maxDim/width); width = maxDim; }
+        else if(height >= width && height > maxDim){ width = width*(maxDim/height); height = maxDim; }
+        const c = document.createElement('canvas');
+        c.width = width; c.height = height;
+        c.getContext('2d').drawImage(img,0,0,width,height);
+        resolve(c.toDataURL('image/jpeg',quality));
       };
       img.onerror = reject;
       img.src = e.target.result;
@@ -583,216 +442,178 @@ function resizeImage(file, maxDim, quality){
   });
 }
 
-async function handleHero(e){
-  const file = e.target.files[0];
-  if(!file) return;
-  const data = await resizeImage(file, 500, 0.8);
-  partyData.hero = data;
-  const prev = document.getElementById('heroPreview');
-  prev.src = data; prev.style.display='block';
-  document.getElementById('heroIcon').style.display='none';
-  document.getElementById('heroLabel').textContent='Looks great — click to change';
-}
+let mainPhotoData = null;
+let memPhotosData = [];
 
-async function handleGallery(e){
-  const files = Array.from(e.target.files);
+document.getElementById('mainPhotoDrop').addEventListener('click', ()=>document.getElementById('mainPhoto').click());
+document.getElementById('mainPhoto').addEventListener('change', async e=>{
+  const f = e.target.files[0];
+  if(!f) return;
+  mainPhotoData = await resizeImageFile(f, 480, 0.75);
+  document.getElementById('mainPhotoLabel').textContent = f.name;
+  document.getElementById('mainPhotoThumb').innerHTML = `<img src="${mainPhotoData}">`;
+});
+
+document.getElementById('memPhotoDrop').addEventListener('click', ()=>document.getElementById('memPhotos').click());
+document.getElementById('memPhotos').addEventListener('change', async e=>{
+  const files = Array.from(e.target.files).slice(0,12);
+  memPhotosData = [];
+  const thumbBox = document.getElementById('memPhotoThumb');
+  thumbBox.innerHTML = '';
+  document.getElementById('memPhotoLabel').textContent = files.length + ' photo(s) selected';
   for(const f of files){
-    const data = await resizeImage(f, 480, 0.75);
-    partyData.photos.push(data);
+    const d = await resizeImageFile(f, 380, 0.7);
+    memPhotosData.push(d);
+    thumbBox.insertAdjacentHTML('beforeend', `<img src="${d}">`);
   }
-  renderGalleryGrid();
-  e.target.value='';
+});
+
+/* ============================================================
+   GENERATE LINK
+============================================================ */
+function encodeData(obj){
+  const json = JSON.stringify(obj);
+  return btoa(unescape(encodeURIComponent(json)));
+}
+function decodeData(str){
+  const json = decodeURIComponent(escape(atob(str)));
+  return JSON.parse(json);
 }
 
-function renderGalleryGrid(){
-  const grid = document.getElementById('galleryGrid');
-  grid.innerHTML='';
-  partyData.photos.forEach((p,i)=>{
-    const div = document.createElement('div');
-    div.className='gallery-thumb';
-    div.innerHTML = `<img src="${p}"><button class="rm" onclick="removePhoto(${i})">✕</button>`;
-    grid.appendChild(div);
-  });
-}
-function removePhoto(i){ partyData.photos.splice(i,1); renderGalleryGrid(); }
+document.getElementById('generateBtn').addEventListener('click', ()=>{
+  const err = document.getElementById('createError');
+  const name = document.getElementById('personName').value.trim();
+  const dob = document.getElementById('personDOB').value;
+  const memoryText = document.getElementById('memoryText').value.trim();
 
-function addMemoryRow(value){
-  const list = document.getElementById('memList');
-  const row = document.createElement('div');
-  row.className='mem-row';
-  row.innerHTML = `<textarea rows="2" placeholder="A memory or birthday wish…">${value||''}</textarea><button class="rm" onclick="this.parentElement.remove()">✕</button>`;
-  list.appendChild(row);
-}
+  if(!mainPhotoData){ err.textContent = 'Please add a main photo.'; return; }
+  if(!name){ err.textContent = 'Please add a name.'; return; }
+  if(!dob){ err.textContent = 'Please add a date of birth.'; return; }
+  err.textContent = '';
 
-function collectMemories(){
-  return Array.from(document.querySelectorAll('#memList textarea'))
-    .map(t=>t.value.trim()).filter(Boolean);
-}
+  const data = {
+    n: name,
+    d: dob,
+    m: memoryText,
+    mainPhoto: mainPhotoData,
+    photos: memPhotosData
+  };
 
-function randCode(len){
-  const chars='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  let s='';
-  for(let i=0;i<len;i++) s+=chars[Math.floor(Math.random()*chars.length)];
-  return s;
-}
+  const encoded = encodeData(data);
+  const url = location.href.split('#')[0] + '#party=' + encoded;
 
-function buildPartyLink(code){
-  const base = window.location.origin + window.location.pathname;
-  return base + '#party=' + code;
-}
+  document.getElementById('linkBox').textContent = url;
+  document.getElementById('linkResult').style.display = 'block';
 
-async function generateParty(){
-  const btn = document.getElementById('generateBtn');
-  const err = document.getElementById('genErr');
-  partyData.memories = collectMemories();
-  if(!partyData.hero || !partyData.name || !partyData.dob){
-    err.textContent = 'Missing hero photo, name or date of birth — go back and complete step 1.';
-    return;
-  }
-  btn.textContent = 'Generating…';
-  btn.disabled = true;
-  try{
-    const code = randCode(6);
-    await window.storage.set('codex-party-'+code, JSON.stringify(partyData), true);
-    currentPreviewCode = code;
-    const link = buildPartyLink(code);
-    document.getElementById('genLink').textContent = link;
-    document.getElementById('genCode').textContent = 'fallback code: '+code;
-    err.textContent='';
-    showScreen('genScreen');
-  }catch(e){
-    err.textContent = 'Something went wrong generating the link. Please try again.';
-  }finally{
-    btn.textContent = '🎉 Generate party link';
-    btn.disabled = false;
-  }
-}
+  document.getElementById('copyLinkBtn').onclick = ()=>{
+    navigator.clipboard.writeText(url).then(()=>{
+      document.getElementById('copyLinkBtn').textContent = 'Copied ✓';
+      setTimeout(()=>document.getElementById('copyLinkBtn').textContent='Copy link',1500);
+    }).catch(()=>{});
+  };
+  document.getElementById('openLinkBtn').onclick = ()=>{
+    location.hash = 'party=' + encoded;
+    renderParty(data);
+    showScreen('party');
+  };
+});
 
-function copyLink(){
-  const link = document.getElementById('genLink').textContent;
-  const btn = document.getElementById('copyLinkBtn');
-  const done = ()=>{ const old = btn.textContent; btn.textContent='✅ Copied!'; setTimeout(()=>btn.textContent=old,1600); };
-  if(navigator.clipboard){
-    navigator.clipboard.writeText(link).then(done).catch(done);
-  } else { done(); }
-}
+/* ============================================================
+   RENDER PARTY / REVEAL PAGE
+============================================================ */
+let ageInterval = null;
 
-function previewParty(){
-  if(!currentPreviewCode) return;
-  renderParty(partyData, currentPreviewCode);
-  showScreen('partyScreen');
-}
+function renderParty(data){
+  document.getElementById('partyMainPhoto').src = data.mainPhoto || '';
+  document.getElementById('partyName').textContent = data.n || 'Someone special';
 
-/* ---------------- party rendering ---------------- */
-let ageTimer = null;
-
-function renderParty(data, code){
-  document.getElementById('viewHeroImg').src = data.hero;
-  document.getElementById('viewName').textContent = data.name;
-  document.getElementById('partyCodeTag').textContent = 'invite · '+code;
-
-  // orbiting decorations
-  const orbit = document.getElementById('orbitLayer');
-  orbit.innerHTML='';
-  const deco = ['🎈','🎂','✨','🎁'];
-  deco.forEach((em,i)=>{
-    const angle = (i/deco.length)*360;
-    const span = document.createElement('span');
-    span.textContent = em;
-    const rad = 143;
-    const x = Math.cos(angle*Math.PI/180)*rad + rad;
-    const y = Math.sin(angle*Math.PI/180)*rad + rad;
-    span.style.left = x+'px';
-    span.style.top = y+'px';
-    orbit.appendChild(span);
-  });
+  const dobDate = new Date(data.d);
+  const dobLabel = isNaN(dobDate) ? '' : dobDate.toLocaleDateString(undefined,{year:'numeric',month:'long',day:'numeric'});
+  document.getElementById('partyDobLabel').textContent = dobLabel ? ('DOB · ' + dobLabel) : '';
 
   // gallery
-  const gv = document.getElementById('galleryView');
-  gv.innerHTML='';
-  (data.photos||[]).forEach((p,i)=>{
+  const gallery = document.getElementById('gallery');
+  gallery.innerHTML = '';
+  (data.photos || []).forEach((src,i)=>{
     const card = document.createElement('div');
-    card.className='g-card';
+    card.className = 'float-card';
     card.style.animationDelay = (i*0.35)+'s';
-    card.innerHTML = `<img src="${p}"><div class="glow"></div>`;
+    card.innerHTML = `<img src="${src}" alt="memory">`;
     card.addEventListener('mousemove', e=>{
       const r = card.getBoundingClientRect();
-      const rx = ((e.clientY-r.top)/r.height - 0.5) * -16;
-      const ry = ((e.clientX-r.left)/r.width - 0.5) * 16;
-      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(10px)`;
+      const rx = ((e.clientY-r.top)/r.height - 0.5) * -18;
+      const ry = ((e.clientX-r.left)/r.width - 0.5) * 18;
+      card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(20px)`;
     });
     card.addEventListener('mouseleave', ()=>{ card.style.transform=''; });
-    gv.appendChild(card);
+    gallery.appendChild(card);
   });
-  if(!(data.photos||[]).length){
-    gv.innerHTML = '<div style="color:var(--text-dim);font-size:13px;">No memory photos were added.</div>';
-  }
 
   // messages
-  const ms = document.getElementById('msgStage');
-  ms.innerHTML='';
-  const mems = (data.memories||[]).filter(Boolean);
-  if(!mems.length){
-    ms.innerHTML = '<div style="color:var(--text-dim);font-size:13px;">No messages were added.</div>';
-  } else {
-    mems.forEach((m,i)=>{
-      const b = document.createElement('div');
-      b.className='bubble';
-      const leftPct = (i%3)*33 + Math.random()*8;
-      const top = Math.floor(i/3)*150 + Math.random()*20;
-      b.style.position='absolute';
-      b.style.left = leftPct+'%';
-      b.style.top = top+'px';
-      b.style.animationDelay = (i*0.4)+'s';
-      b.style.animationDuration = (5+Math.random()*3)+'s';
-      b.innerHTML = `<span class="quote">"</span>${m}`;
-      ms.appendChild(b);
-    });
-    const rows = Math.ceil(mems.length/3);
-    ms.style.minHeight = (rows*150+140)+'px';
-  }
+  const messagesBox = document.getElementById('messages');
+  messagesBox.innerHTML = '';
+  const lines = (data.m || '').split('\n').map(s=>s.trim()).filter(Boolean);
+  if(lines.length === 0 && data.m){ lines.push(data.m); }
+  lines.forEach((line,i)=>{
+    const bubble = document.createElement('div');
+    bubble.className = 'msg-bubble';
+    bubble.style.animationDelay = (i*0.4)+'s';
+    bubble.textContent = line;
+    messagesBox.appendChild(bubble);
+  });
 
-  // live age
-  if(ageTimer) clearInterval(ageTimer);
-  const dobDate = new Date(data.dob+'T00:00:00');
+  // live age counter
+  if(ageInterval) clearInterval(ageInterval);
   function tick(){
+    if(isNaN(dobDate)) return;
     const now = new Date();
     let years = now.getFullYear() - dobDate.getFullYear();
-    let last = new Date(dobDate);
-    last.setFullYear(dobDate.getFullYear()+years);
-    if(last > now){ years--; last = new Date(dobDate); last.setFullYear(dobDate.getFullYear()+years); }
-    const diff = now - last;
-    const days = Math.floor(diff/86400000);
-    const hours = Math.floor((diff%86400000)/3600000);
-    const mins = Math.floor((diff%3600000)/60000);
-    const secs = Math.floor((diff%60000)/1000);
-    document.getElementById('ageYears').textContent = years;
-    document.getElementById('ageDays').textContent = days;
-    document.getElementById('ageHours').textContent = String(hours).padStart(2,'0');
-    document.getElementById('ageMins').textContent = String(mins).padStart(2,'0');
-    document.getElementById('ageSecs').textContent = String(secs).padStart(2,'0');
+    const annivThisYear = new Date(now.getFullYear(), dobDate.getMonth(), dobDate.getDate());
+    if(now < annivThisYear) years--;
+
+    const lastAnniv = new Date(now.getFullYear(), dobDate.getMonth(), dobDate.getDate());
+    if(now < lastAnniv) lastAnniv.setFullYear(lastAnniv.getFullYear()-1);
+
+    const diffMs = now - lastAnniv;
+    const days = Math.floor(diffMs/86400000);
+    const hh = String(Math.floor((diffMs/3600000)%24)).padStart(2,'0');
+    const mm = String(Math.floor((diffMs/60000)%60)).padStart(2,'0');
+    const ss = String(Math.floor((diffMs/1000)%60)).padStart(2,'0');
+
+    document.getElementById('cYears').textContent = years;
+    document.getElementById('cDays').textContent = days;
+    document.getElementById('cTime').textContent = `${hh}:${mm}:${ss}`;
   }
   tick();
-  ageTimer = setInterval(tick,1000);
+  ageInterval = setInterval(tick,1000);
+
+  document.getElementById('partyCopyBtn').onclick = ()=>{
+    navigator.clipboard.writeText(location.href).then(()=>{
+      document.getElementById('partyCopyBtn').textContent = 'Copied ✓';
+      setTimeout(()=>document.getElementById('partyCopyBtn').textContent='Copy this link',1500);
+    }).catch(()=>{});
+  };
+  document.getElementById('partyBackBtn').onclick = ()=>{
+    location.hash = '';
+    showScreen('loginScreen');
+  };
 }
 
-/* init: if opened via a shared #party=CODE link, jump straight to that party */
-async function checkIncomingLink(){
-  const m = window.location.hash.match(/party=([A-Za-z0-9]+)/);
-  if(!m) return false;
-  const code = m[1].toUpperCase();
-  try{
-    const res = await window.storage.get('codex-party-'+code, true);
-    if(!res) return false;
-    const data = JSON.parse(res.value);
-    renderParty(data, code);
-    showScreen('partyScreen');
-    return true;
-  }catch(e){ return false; }
-}
-
-resetForm();
-checkIncomingLink();
+/* ============================================================
+   INIT / ROUTING
+============================================================ */
+(function init(){
+  const hash = location.hash;
+  if(hash.startsWith('#party=')){
+    try{
+      const data = decodeData(hash.slice(7));
+      renderParty(data);
+      showScreen('party');
+      return;
+    }catch(e){ console.error('Could not read link data', e); }
+  }
+  showScreen('loginScreen');
+})();
 </script>
 </body>
 </html>
