@@ -333,6 +333,23 @@
   #webview-banner.show{ display:block; }
   #webview-banner a{ color:#1a0b2e; text-decoration:underline; }
   #error-screen .card{ max-width:440px; padding:40px; text-align:center; }
+ 
+  .gh-settings{ margin-bottom: 22px; }
+  .gh-toggle{
+    background: rgba(255,255,255,0.04); border:1px solid var(--glass-brd); color:var(--ink-dim);
+    width:100%; text-align:left; padding:11px 14px; border-radius:10px; font-size:13px; font-weight:500;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .gh-dot{ width:8px; height:8px; border-radius:50%; background:#ff5d7a; display:inline-block; }
+  .gh-dot.ok{ background:#4ee6a0; }
+  .gh-panel{ display:none; padding: 18px 4px 4px; }
+  .gh-panel.open{ display:block; }
+ 
+  .spinner{
+    width:36px; height:36px; margin:0 auto;
+    border:3px solid rgba(255,255,255,0.15); border-top-color: var(--gold);
+    border-radius:50%; animation: spin 0.9s linear infinite;
+  }
 </style>
 </head>
 <body>
@@ -401,6 +418,28 @@
         <div class="gallery-thumbs" id="gallery-thumbs"></div>
       </div>
  
+      <div class="gh-settings" id="gh-settings-box">
+        <button type="button" class="gh-toggle" id="gh-toggle-btn">⚙️ Link storage settings <span id="gh-status-dot" class="gh-dot"></span></button>
+        <div class="gh-panel" id="gh-panel">
+          <p class="hint" style="margin-bottom:14px;">Photos make links too long for some apps to pass along intact. Storing the data in your own GitHub repo instead keeps the shareable link short and reliable everywhere. This is a one-time setup on this device.</p>
+          <div class="field">
+            <label class="field-label">GitHub username</label>
+            <input type="text" id="gh-owner" placeholder="e.g. your-username">
+          </div>
+          <div class="field">
+            <label class="field-label">Repository name</label>
+            <input type="text" id="gh-repo" placeholder="e.g. my-birthday-site">
+          </div>
+          <div class="field">
+            <label class="field-label">Personal access token</label>
+            <input type="text" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+            <div class="hint">Create one at github.com → Settings → Developer settings → Personal access tokens → Tokens (classic) → check the "repo" box. Stored only in this browser, never sent anywhere except GitHub.</div>
+          </div>
+          <button class="btn-ghost" id="gh-save-btn" type="button">Save settings</button>
+          <span id="gh-save-msg" class="hint" style="margin-left:10px;"></span>
+        </div>
+      </div>
+ 
       <div class="form-actions">
         <button class="btn-ghost" id="logout-btn" type="button">Log out</button>
         <button class="btn-primary" id="generate-btn" disabled>Generate shareable link</button>
@@ -414,18 +453,26 @@
   <div class="glass card">
     <div class="link-icon">🔗</div>
     <h2 style="font-size:22px;">Your page is ready</h2>
-    <p style="color:var(--ink-dim); font-size:13.5px; margin-top:6px;">Share this link with anyone, on any phone or browser — the whole page travels inside the link itself, no server needed.</p>
+    <p style="color:var(--ink-dim); font-size:13.5px; margin-top:6px;">Share this short link with anyone, on any phone or browser or app — it works everywhere.</p>
     <div class="link-box">
       <input type="text" id="share-link" readonly>
       <button class="copy-btn" id="copy-link-btn" type="button">Copy</button>
     </div>
     <div class="note" id="link-note">
-      This link contains all the data (name, DOB, memory, photos), so it works on any device. Fewer / smaller photos keep the link shorter and easier to send over SMS or chat apps.
+      This link only carries a short reference — the actual page data is fetched from your GitHub repo when it's opened, so nothing gets cut off in transit.
     </div>
     <div class="link-actions">
       <button class="btn-ghost" id="back-to-form-btn" type="button">Edit details</button>
       <button class="btn-primary" id="view-page-btn" type="button">Open page</button>
     </div>
+  </div>
+</div>
+ 
+<!-- ============ LOADING SCREEN ============ -->
+<div class="screen" id="loading-screen">
+  <div class="glass card" style="text-align:center; padding:40px;">
+    <div class="spinner"></div>
+    <p style="margin-top:18px; color:var(--ink-dim); font-size:13.5px;" id="loading-text">Loading the party page…</p>
   </div>
 </div>
  
@@ -499,7 +546,7 @@
   "use strict";
  
   /* ---------------- utility: screens ---------------- */
-  const screens = ['login-screen','form-screen','link-screen','party-screen','not-found-screen','error-screen'];
+  const screens = ['login-screen','form-screen','link-screen','loading-screen','party-screen','not-found-screen','error-screen'];
   function showScreen(id){
     screens.forEach(s => document.getElementById(s).classList.toggle('active', s === id));
     window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
@@ -645,8 +692,79 @@
     document.getElementById('generate-btn').disabled = !(name && dob);
   }
  
-  /* ---------------- generate: embed data directly in the URL ---------------- */
-  document.getElementById('generate-btn').addEventListener('click', ()=>{
+  /* ---------------- GitHub settings panel ---------------- */
+  const GH_KEYS = { owner:'codex_gh_owner', repo:'codex_gh_repo', token:'codex_gh_token' };
+  function loadGhSettings(){
+    return {
+      owner: localStorage.getItem(GH_KEYS.owner) || '',
+      repo: localStorage.getItem(GH_KEYS.repo) || '',
+      token: localStorage.getItem(GH_KEYS.token) || ''
+    };
+  }
+  function ghConfigured(){
+    const s = loadGhSettings();
+    return !!(s.owner && s.repo && s.token);
+  }
+  function refreshGhStatusDot(){
+    document.getElementById('gh-status-dot').classList.toggle('ok', ghConfigured());
+  }
+  (function initGhFields(){
+    const s = loadGhSettings();
+    document.getElementById('gh-owner').value = s.owner;
+    document.getElementById('gh-repo').value = s.repo;
+    document.getElementById('gh-token').value = s.token;
+    refreshGhStatusDot();
+  })();
+  document.getElementById('gh-toggle-btn').addEventListener('click', ()=>{
+    document.getElementById('gh-panel').classList.toggle('open');
+  });
+  document.getElementById('gh-save-btn').addEventListener('click', ()=>{
+    localStorage.setItem(GH_KEYS.owner, document.getElementById('gh-owner').value.trim());
+    localStorage.setItem(GH_KEYS.repo, document.getElementById('gh-repo').value.trim());
+    localStorage.setItem(GH_KEYS.token, document.getElementById('gh-token').value.trim());
+    refreshGhStatusDot();
+    const msg = document.getElementById('gh-save-msg');
+    msg.textContent = 'Saved ✓';
+    setTimeout(()=> msg.textContent = '', 2000);
+  });
+ 
+  function toBase64Utf8(str){
+    return btoa(unescape(encodeURIComponent(str)));
+  }
+ 
+  async function uploadPartyDataToGithub(data){
+    const s = loadGhSettings();
+    const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
+    const path = 'party-data/' + id + '.json';
+    const apiUrl = 'https://api.github.com/repos/' + encodeURIComponent(s.owner) + '/' + encodeURIComponent(s.repo) + '/contents/' + path;
+    const res = await fetch(apiUrl, {
+      method: 'PUT',
+      headers: {
+        'Authorization': 'Bearer ' + s.token,
+        'Accept': 'application/vnd.github+json',
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        message: 'Add birthday party data ' + id,
+        content: toBase64Utf8(JSON.stringify(data))
+      })
+    });
+    if(!res.ok){
+      const errBody = await res.text().catch(()=> '');
+      throw new Error('GitHub upload failed (' + res.status + '): ' + errBody.slice(0,200));
+    }
+    const json = await res.json();
+    return json.content && json.content.download_url;
+  }
+ 
+  /* ---------------- generate: short link backed by GitHub ---------------- */
+  document.getElementById('generate-btn').addEventListener('click', async ()=>{
+    if(!ghConfigured()){
+      document.getElementById('gh-panel').classList.add('open');
+      document.getElementById('gh-save-msg').textContent = 'Please fill in and save these first — needed to create a short, reliable link.';
+      document.getElementById('gh-settings-box').scrollIntoView({behavior:'smooth', block:'center'});
+      return;
+    }
     const data = {
       name: document.getElementById('p-name').value.trim(),
       dob: document.getElementById('p-dob').value,
@@ -654,22 +772,25 @@
       avatar: avatarDataUrl,
       gallery: galleryDataUrls.slice()
     };
-    const json = JSON.stringify(data);
-    const compressed = LZString.compressToEncodedURIComponent(json);
-    const query = '?data=' + compressed;
-    const url = location.origin + location.pathname + query;
- 
-    document.getElementById('share-link').value = url;
-    history.replaceState(null, '', query);
- 
-    const note = document.getElementById('link-note');
-    const approxKB = Math.round((url.length) / 1024 * 10) / 10;
-    if(url.length > 60000){
-      note.textContent = 'Heads up: this link is quite long (~' + approxKB + ' KB) because of the photos. Some apps may mangle very long links — using fewer or smaller photos keeps it reliable everywhere.';
-    } else {
-      note.textContent = 'This link contains all the data (name, DOB, memory, photos), so it works on any device or phone — nothing is stored on a server.';
+    const btn = document.getElementById('generate-btn');
+    const oldLabel = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Uploading…';
+    try{
+      const downloadUrl = await uploadPartyDataToGithub(data);
+      if(!downloadUrl) throw new Error('No download URL returned');
+      const query = '?src=' + encodeURIComponent(downloadUrl);
+      const url = location.origin + location.pathname + query;
+      document.getElementById('share-link').value = url;
+      history.replaceState(null, '', query);
+      document.getElementById('link-note').textContent = 'This link only carries a short reference — the actual page data is fetched from your GitHub repo when it\'s opened, so nothing gets cut off in transit.';
+      showScreen('link-screen');
+    }catch(err){
+      alert('Could not generate the link: ' + err.message + '\n\nDouble-check your GitHub username, repo name, and that the token has "repo" access.');
+    }finally{
+      btn.disabled = false;
+      btn.textContent = oldLabel;
     }
-    showScreen('link-screen');
   });
  
   document.getElementById('copy-link-btn').addEventListener('click', ()=>{
@@ -685,12 +806,28 @@
  
   document.getElementById('back-to-form-btn').addEventListener('click', ()=> showScreen('form-screen'));
   document.getElementById('view-page-btn').addEventListener('click', ()=>{
-    renderPartyFromHash();
+    loadPartyFromUrl();
   });
   /* ---------------- party rendering ---------------- */
   let ageInterval = null;
  
-  function renderPartyFromHash(){
+  async function loadPartyFromUrl(){
+    const srcMatch = location.search.match(/[?&]src=([^&]+)/);
+    if(srcMatch){
+      showScreen('loading-screen');
+      try{
+        const rawUrl = decodeURIComponent(srcMatch[1]);
+        const res = await fetch(rawUrl);
+        if(!res.ok) throw new Error('fetch failed: ' + res.status);
+        const data = await res.json();
+        if(!data || !data.name || !data.dob) throw new Error('bad data');
+        renderPartyData(data);
+      }catch(err){
+        showScreen('not-found-screen');
+      }
+      return;
+    }
+ 
     let match = location.search.match(/[?&]data=([^&]+)/);
     if(!match){ match = location.hash.match(/data=([^&]+)/); }
     if(!match){ showScreen('not-found-screen'); return; }
@@ -820,8 +957,8 @@
   /* ---------------- boot ---------------- */
   function boot(){
     checkInAppBrowser();
-    if(location.search.indexOf('data=') !== -1 || location.hash.indexOf('data=') !== -1){
-      renderPartyFromHash();
+    if(location.search.indexOf('src=') !== -1 || location.search.indexOf('data=') !== -1 || location.hash.indexOf('data=') !== -1){
+      loadPartyFromUrl();
       return;
     }
     if(sessionStorage.getItem('codex_authed') === '1'){
