@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>code-x </title>
+<title>code-x • 3D Birthday Party Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
@@ -633,16 +633,16 @@
     };
     const json = JSON.stringify(data);
     const compressed = LZString.compressToEncodedURIComponent(json);
-    const hash = '#data=' + compressed;
-    const url = location.origin + location.pathname + hash;
+    const query = '?data=' + compressed;
+    const url = location.origin + location.pathname + query;
  
     document.getElementById('share-link').value = url;
-    history.replaceState(null, '', hash);
+    history.replaceState(null, '', query);
  
     const note = document.getElementById('link-note');
     const approxKB = Math.round((url.length) / 1024 * 10) / 10;
     if(url.length > 60000){
-      note.textContent = 'Heads up: this link is quite long (~' + approxKB + ' KB) because of the photos. Some messaging apps may truncate very long links — using fewer or smaller photos keeps it reliable everywhere.';
+      note.textContent = 'Heads up: this link is quite long (~' + approxKB + ' KB) because of the photos. Some apps may mangle very long links — using fewer or smaller photos keeps it reliable everywhere.';
     } else {
       note.textContent = 'This link contains all the data (name, DOB, memory, photos), so it works on any device or phone — nothing is stored on a server.';
     }
@@ -668,8 +668,8 @@
   let ageInterval = null;
  
   function renderPartyFromHash(){
-    const hash = location.hash;
-    const match = hash.match(/data=([^&]+)/);
+    let match = location.search.match(/[?&]data=([^&]+)/);
+    if(!match){ match = location.hash.match(/data=([^&]+)/); }
     if(!match){ showScreen('not-found-screen'); return; }
     let data;
     try{
@@ -779,7 +779,7 @@
  
   /* ---------------- boot ---------------- */
   function boot(){
-    if(location.hash.indexOf('data=') !== -1){
+    if(location.search.indexOf('data=') !== -1 || location.hash.indexOf('data=') !== -1){
       renderPartyFromHash();
       return;
     }
