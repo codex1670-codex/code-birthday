@@ -7,7 +7,7 @@
 <title>code-x • 3D Birthday Party Generator</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lz-string/1.5.0/lz-string.min.js" onerror="window.__lzFailed=true"></script>
 <style>
   :root{
     --void: #0a0518;
@@ -323,9 +323,23 @@
       animation: none !important;
     }
   }
+ 
+  #webview-banner{
+    position:fixed; top:0; left:0; right:0; z-index:50;
+    background: linear-gradient(90deg, var(--gold), var(--magenta));
+    color:#1a0b2e; font-family: var(--font-body); font-weight:600; font-size:13px;
+    text-align:center; padding:10px 16px; display:none;
+  }
+  #webview-banner.show{ display:block; }
+  #webview-banner a{ color:#1a0b2e; text-decoration:underline; }
+  #error-screen .card{ max-width:440px; padding:40px; text-align:center; }
 </style>
 </head>
 <body>
+ 
+<div id="webview-banner">
+  ⚠️ You're viewing this inside an app's built-in browser, which can block parts of this page. Tap the ••• or share icon and choose "Open in Browser" for the full experience.
+</div>
  
 <canvas id="confetti-canvas"></canvas>
  
@@ -471,12 +485,21 @@
   </div>
 </div>
  
+<!-- ============ GENERIC ERROR ============ -->
+<div class="screen" id="error-screen">
+  <div class="glass card">
+    <div class="link-icon">🔌</div>
+    <h2 style="font-size:20px;">This page couldn't fully load</h2>
+    <p style="color:var(--ink-dim); font-size:13.5px; margin-top:8px;">Something needed to build the page was blocked — often caused by an app's built-in browser (Instagram, Facebook, etc.). Try opening this link in your regular browser (Chrome / Safari) instead.</p>
+  </div>
+</div>
+ 
 <script>
 (function(){
   "use strict";
  
   /* ---------------- utility: screens ---------------- */
-  const screens = ['login-screen','form-screen','link-screen','party-screen','not-found-screen'];
+  const screens = ['login-screen','form-screen','link-screen','party-screen','not-found-screen','error-screen'];
   function showScreen(id){
     screens.forEach(s => document.getElementById(s).classList.toggle('active', s === id));
     window.scrollTo({top:0, behavior:'instant' in window ? 'instant' : 'auto'});
@@ -671,6 +694,10 @@
     let match = location.search.match(/[?&]data=([^&]+)/);
     if(!match){ match = location.hash.match(/data=([^&]+)/); }
     if(!match){ showScreen('not-found-screen'); return; }
+    if(window.__lzFailed || typeof LZString === 'undefined'){
+      showScreen('error-screen');
+      return;
+    }
     let data;
     try{
       const json = LZString.decompressFromEncodedURIComponent(match[1]);
@@ -680,7 +707,11 @@
       showScreen('not-found-screen');
       return;
     }
-    renderPartyData(data);
+    try{
+      renderPartyData(data);
+    }catch(err){
+      showScreen('error-screen');
+    }
   }
  
   function renderPartyData(data){
@@ -777,8 +808,18 @@
     });
   }
  
+  /* ---------------- in-app browser detection ---------------- */
+  function checkInAppBrowser(){
+    const ua = navigator.userAgent || '';
+    const isInApp = /Instagram|FBAN|FBAV|FB_IAB|Line\/|MicroMessenger|TikTok|Twitter/i.test(ua);
+    if(isInApp){
+      document.getElementById('webview-banner').classList.add('show');
+    }
+  }
+ 
   /* ---------------- boot ---------------- */
   function boot(){
+    checkInAppBrowser();
     if(location.search.indexOf('data=') !== -1 || location.hash.indexOf('data=') !== -1){
       renderPartyFromHash();
       return;
@@ -789,9 +830,14 @@
       showScreen('login-screen');
     }
   }
-  boot();
+  try{
+    boot();
+  }catch(err){
+    showScreen('error-screen');
+  }
 })();
 </script>
 </body>
 </html>
+
  
