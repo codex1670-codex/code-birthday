@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -421,19 +420,11 @@
       <div class="gh-settings" id="gh-settings-box">
         <button type="button" class="gh-toggle" id="gh-toggle-btn">⚙️ Link storage settings <span id="gh-status-dot" class="gh-dot"></span></button>
         <div class="gh-panel" id="gh-panel">
-          <p class="hint" style="margin-bottom:14px;">Photos make links too long for some apps to pass along intact. Storing the data in your own GitHub repo instead keeps the shareable link short and reliable everywhere. This is a one-time setup on this device.</p>
+          <p class="hint" style="margin-bottom:14px;">Photos make links too long for some apps to pass along intact. Storing the data with a GitHub token instead keeps the shareable link short and reliable everywhere — and it opens fine on any phone or browser. This is a one-time setup on this device.</p>
           <div class="field">
-            <label class="field-label">GitHub username</label>
-            <input type="text" id="gh-owner" placeholder="e.g. your-username">
-          </div>
-          <div class="field">
-            <label class="field-label">Repository name</label>
-            <input type="text" id="gh-repo" placeholder="e.g. my-birthday-site">
-          </div>
-          <div class="field">
-            <label class="field-label">Personal access token</label>
+            <label class="field-label">GitHub personal access token</label>
             <input type="text" id="gh-token" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-            <div class="hint">Create one at github.com → Settings → Developer settings → Personal access tokens → Tokens (classic) → check the "repo" box. Stored only in this browser, never sent anywhere except GitHub.</div>
+            <div class="hint">Create one at github.com → Settings → Developer settings → Personal access tokens → Tokens (classic) → check the "gist" box. Stored only in this browser, never sent anywhere except GitHub.</div>
           </div>
           <button class="btn-ghost" id="gh-save-btn" type="button">Save settings</button>
           <span id="gh-save-msg" class="hint" style="margin-left:10px;"></span>
@@ -459,7 +450,7 @@
       <button class="copy-btn" id="copy-link-btn" type="button">Copy</button>
     </div>
     <div class="note" id="link-note">
-      This link only carries a short reference — the actual page data is fetched from your GitHub repo when it's opened, so nothing gets cut off in transit.
+      This link only carries a short reference — the actual page data is fetched from GitHub when it's opened, so nothing gets cut off in transit and it opens the same on any phone.
     </div>
     <div class="link-actions">
       <button class="btn-ghost" id="back-to-form-btn" type="button">Edit details</button>
@@ -692,26 +683,22 @@
     document.getElementById('generate-btn').disabled = !(name && dob);
   }
  
-  /* ---------------- GitHub settings panel ---------------- */
-  const GH_KEYS = { owner:'codex_gh_owner', repo:'codex_gh_repo', token:'codex_gh_token' };
+  /* ---------------- GitHub settings panel (token only, uses Gists) ---------------- */
+  const GH_KEYS = { token:'codex_gh_token' };
   function loadGhSettings(){
     return {
-      owner: localStorage.getItem(GH_KEYS.owner) || '',
-      repo: localStorage.getItem(GH_KEYS.repo) || '',
       token: localStorage.getItem(GH_KEYS.token) || ''
     };
   }
   function ghConfigured(){
     const s = loadGhSettings();
-    return !!(s.owner && s.repo && s.token);
+    return !!(s.token);
   }
   function refreshGhStatusDot(){
     document.getElementById('gh-status-dot').classList.toggle('ok', ghConfigured());
   }
   (function initGhFields(){
     const s = loadGhSettings();
-    document.getElementById('gh-owner').value = s.owner;
-    document.getElementById('gh-repo').value = s.repo;
     document.getElementById('gh-token').value = s.token;
     refreshGhStatusDot();
   })();
@@ -719,8 +706,6 @@
     document.getElementById('gh-panel').classList.toggle('open');
   });
   document.getElementById('gh-save-btn').addEventListener('click', ()=>{
-    localStorage.setItem(GH_KEYS.owner, document.getElementById('gh-owner').value.trim());
-    localStorage.setItem(GH_KEYS.repo, document.getElementById('gh-repo').value.trim());
     localStorage.setItem(GH_KEYS.token, document.getElementById('gh-token').value.trim());
     refreshGhStatusDot();
     const msg = document.getElementById('gh-save-msg');
@@ -728,25 +713,22 @@
     setTimeout(()=> msg.textContent = '', 2000);
   });
  
-  function toBase64Utf8(str){
-    return btoa(unescape(encodeURIComponent(str)));
-  }
- 
   async function uploadPartyDataToGithub(data){
     const s = loadGhSettings();
-    const id = 'p' + Date.now().toString(36) + Math.random().toString(36).slice(2,8);
-    const path = 'party-data/' + id + '.json';
-    const apiUrl = 'https://api.github.com/repos/' + encodeURIComponent(s.owner) + '/' + encodeURIComponent(s.repo) + '/contents/' + path;
-    const res = await fetch(apiUrl, {
-      method: 'PUT',
+    const id = 'party-' + Date.now().toString(36) + Math.random().toString(36).slice(2,8) + '.json';
+    const res = await fetch('https://api.github.com/gists', {
+      method: 'POST',
       headers: {
         'Authorization': 'Bearer ' + s.token,
         'Accept': 'application/vnd.github+json',
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        message: 'Add birthday party data ' + id,
-        content: toBase64Utf8(JSON.stringify(data))
+        description: 'code-x birthday party data',
+        public: false,
+        files: {
+          [id]: { content: JSON.stringify(data) }
+        }
       })
     });
     if(!res.ok){
@@ -754,14 +736,15 @@
       throw new Error('GitHub upload failed (' + res.status + '): ' + errBody.slice(0,200));
     }
     const json = await res.json();
-    return json.content && json.content.download_url;
+    const file = json.files && json.files[id];
+    return file && file.raw_url;
   }
  
-  /* ---------------- generate: short link backed by GitHub ---------------- */
+  /* ---------------- generate: short link backed by a GitHub Gist ---------------- */
   document.getElementById('generate-btn').addEventListener('click', async ()=>{
     if(!ghConfigured()){
       document.getElementById('gh-panel').classList.add('open');
-      document.getElementById('gh-save-msg').textContent = 'Please fill in and save these first — needed to create a short, reliable link.';
+      document.getElementById('gh-save-msg').textContent = 'Please add and save a GitHub token first — needed to create a short, reliable link.';
       document.getElementById('gh-settings-box').scrollIntoView({behavior:'smooth', block:'center'});
       return;
     }
@@ -783,10 +766,10 @@
       const url = location.origin + location.pathname + query;
       document.getElementById('share-link').value = url;
       history.replaceState(null, '', query);
-      document.getElementById('link-note').textContent = 'This link only carries a short reference — the actual page data is fetched from your GitHub repo when it\'s opened, so nothing gets cut off in transit.';
+      document.getElementById('link-note').textContent = 'This link only carries a short reference — the actual page data is fetched from GitHub when it\'s opened, so nothing gets cut off in transit and it opens the same on any phone.';
       showScreen('link-screen');
     }catch(err){
-      alert('Could not generate the link: ' + err.message + '\n\nDouble-check your GitHub username, repo name, and that the token has "repo" access.');
+      alert('Could not generate the link: ' + err.message + '\n\nDouble-check your GitHub token and that it has "gist" access.');
     }finally{
       btn.disabled = false;
       btn.textContent = oldLabel;
@@ -976,5 +959,3 @@
 </script>
 </body>
 </html>
-
- 
